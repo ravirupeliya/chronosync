@@ -1,4 +1,4 @@
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { Switch } from '@/components/ui/switch'
 
 type AMPMToggleProps = {
   value: 'AM' | 'PM'
@@ -6,27 +6,19 @@ type AMPMToggleProps = {
 }
 
 export function AMPMToggle({ value, onChange }: AMPMToggleProps) {
+  const isPm = value === 'PM'
+
   return (
     <div className="grid gap-2">
-      <span className="text-sm font-medium">AM / PM</span>
-      <ToggleGroup
-        type="single"
-        value={value}
-        onValueChange={(next) => {
-          if (next === 'AM' || next === 'PM') {
-            onChange(next)
-          }
-        }}
-        className="justify-start"
-        aria-label="AM PM toggle"
-      >
-        <ToggleGroupItem value="AM" aria-label="Set AM" className="min-w-14">
-          AM
-        </ToggleGroupItem>
-        <ToggleGroupItem value="PM" aria-label="Set PM" className="min-w-14">
-          PM
-        </ToggleGroupItem>
-      </ToggleGroup>
+      <div className="inline-flex w-fit items-center gap-3 rounded-md border bg-card px-3 py-2">
+        <span className={`text-sm font-medium ${isPm ? 'text-muted-foreground' : 'text-foreground'}`}>AM</span>
+        <Switch
+          checked={isPm}
+          onCheckedChange={(checked) => onChange(checked ? 'PM' : 'AM')}
+          aria-label="Toggle AM PM"
+        />
+        <span className={`text-sm font-medium ${isPm ? 'text-foreground' : 'text-muted-foreground'}`}>PM</span>
+      </div>
     </div>
   )
 }
