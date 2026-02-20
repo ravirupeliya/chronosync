@@ -142,12 +142,9 @@ function App() {
 
   return (
     <main className="min-h-screen bg-background">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4 md:p-6 lg:p-8">
-        <header className="flex items-start justify-between gap-4">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-bold tracking-tight">ChronoSync</h1>
-            <p className="text-muted-foreground">Interactive world clock with timezone-aware DST conversion.</p>
-          </div>
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-4 pt-2 md:px-6 md:pb-6 md:pt-3 lg:px-8 lg:pb-8 lg:pt-4">
+        <header className="flex items-center justify-between gap-4">
+          <h1 className="text-3xl font-bold tracking-tight">ChronoSync</h1>
           <Button
             variant="outline"
             size="icon"
