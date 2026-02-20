@@ -1,6 +1,6 @@
 import { createElement, useMemo, useState, type ComponentType, type SVGProps } from 'react'
 import * as Flags from 'country-flag-icons/react/3x2'
-import { Check, ChevronsUpDown, Globe } from 'lucide-react'
+import { ChevronsUpDown, Globe } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -12,7 +12,6 @@ import {
   CommandList,
 } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { cn } from '@/lib/utils'
 import type { TimeZoneOption } from '@/lib/time-utils'
 
 type TimeZoneSelectProps = {
@@ -31,6 +30,9 @@ const getFlagComponent = (countryCode?: string): ComponentType<SVGProps<SVGSVGEl
   const code = countryCode.toUpperCase()
   return (Flags as Record<string, ComponentType<SVGProps<SVGSVGElement>>>)[code] ?? null
 }
+
+const formatCountryCode = (countryCode?: string): string =>
+  countryCode && countryCode.length === 2 ? countryCode.toUpperCase() : 'GL'
 
 export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }: TimeZoneSelectProps) {
   const [open, setOpen] = useState(false)
@@ -93,6 +95,7 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
               ) : (
                 <Globe className="size-4 text-muted-foreground" aria-hidden />
               )}
+              <span className="text-xs text-muted-foreground">{formatCountryCode(selected?.countryCode)}</span>
               <span className="truncate">{selected?.label ?? 'Select a time zone'}</span>
             </span>
             <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
@@ -126,6 +129,9 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
                     ) : (
                       <Globe className="mr-2 size-4 text-muted-foreground" aria-hidden />
                     )}
+                    <span className="mr-1 text-xs text-muted-foreground">
+                      {formatCountryCode(option.countryCode)}
+                    </span>
                     <span>{option.label}</span>
                   </CommandItem>
                   )
