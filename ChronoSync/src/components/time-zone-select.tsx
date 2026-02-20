@@ -47,7 +47,7 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
             <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[320px] p-0" align="start">
+        <PopoverContent className="w-[320px] p-0" align="start" portalled={false}>
           <Command>
             <CommandInput placeholder="Search time zone..." />
             <CommandList>
