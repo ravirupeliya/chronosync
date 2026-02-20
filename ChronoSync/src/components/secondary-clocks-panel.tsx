@@ -25,6 +25,7 @@ type SecondaryClocksPanelProps = {
   options: TimeZoneOption[]
   onAddClock: (zone: string) => void
   onRemoveClock: (zone: string) => void
+  onClearAllClocks: () => void
 }
 
 export function SecondaryClocksPanel({
@@ -34,6 +35,7 @@ export function SecondaryClocksPanel({
   options,
   onAddClock,
   onRemoveClock,
+  onClearAllClocks,
 }: SecondaryClocksPanelProps) {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [pendingZone, setPendingZone] = useState('')
@@ -60,37 +62,49 @@ export function SecondaryClocksPanel({
           <CardTitle className="text-xl">Secondary Clocks</CardTitle>
           <CardDescription>Synced to primary date and time</CardDescription>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 size-4" />
-              Add clock
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add secondary clock</DialogTitle>
-              <DialogDescription>
-                Choose another IANA time zone to track against the primary clock.
-              </DialogDescription>
-            </DialogHeader>
-            <TimeZoneSelect
-              value={pendingZone}
-              options={options}
-              onChange={setPendingZone}
-              label="Secondary time zone"
-              exclude={[primaryTimeZone, ...secondaryTimeZones]}
-            />
-            <DialogFooter>
-              <Button onClick={addClock} disabled={!pendingZone}>
-                Add
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            className="border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
+            onClick={onClearAllClocks}
+            disabled={secondaryTimeZones.length === 0}
+            aria-label="Clear all secondary clocks"
+          >
+            <Trash2 className="mr-1 size-4" />
+            Clear all
+          </Button>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-1 size-4" />
+                Add clock
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add secondary clock</DialogTitle>
+                <DialogDescription>
+                  Choose another IANA time zone to track against the primary clock.
+                </DialogDescription>
+              </DialogHeader>
+              <TimeZoneSelect
+                value={pendingZone}
+                options={options}
+                onChange={setPendingZone}
+                label="Secondary time zone"
+                exclude={[primaryTimeZone, ...secondaryTimeZones]}
+              />
+              <DialogFooter>
+                <Button className="cursor-pointer" onClick={addClock} disabled={!pendingZone}>
+                  Add
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="pt-3">
         {secondaryTimeZones.length === 0 ? (
           <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
             No secondary clocks yet. Add a clock to compare regions.

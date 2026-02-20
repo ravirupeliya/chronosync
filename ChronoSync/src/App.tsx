@@ -115,6 +115,10 @@ function App() {
     setSecondaryTimeZones((previous) => previous.filter((item) => item !== zone))
   }
 
+  const handleClearAllSecondaryClocks = () => {
+    setSecondaryTimeZones([])
+  }
+
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark')
     window.localStorage.setItem(THEME_STORAGE_KEY, theme)
@@ -171,6 +175,7 @@ function App() {
           options={timeZoneOptions}
           onAddClock={handleAddSecondaryClock}
           onRemoveClock={handleRemoveSecondaryClock}
+          onClearAllClocks={handleClearAllSecondaryClocks}
         />
       </div>
     </main>
