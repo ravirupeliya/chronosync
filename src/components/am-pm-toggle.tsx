@@ -11,7 +11,7 @@ export function AMPMToggle({ value, onChange }: AMPMToggleProps) {
   return (
     <div className="grid gap-2">
       {/* <span className="text-sm font-medium">AM / PM</span> */}
-      <div className="inline-flex w-fit items-center gap-3 rounded-md border bg-card px-3 py-2">
+      <div className="inline-flex h-9 w-fit items-center gap-3 rounded-md border bg-card px-3">
         <span className={`text-sm font-medium ${isPm ? 'text-muted-foreground' : 'text-foreground'}`}>AM</span>
         <Switch
           checked={isPm}
