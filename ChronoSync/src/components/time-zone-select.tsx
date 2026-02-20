@@ -44,7 +44,17 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase()
     if (!normalized) {
-      return available.slice(0, 20)
+      const topOptions = available.slice(0, 20)
+      if (!value || topOptions.some((option) => option.value === value)) {
+        return topOptions
+      }
+
+      const selectedOption = available.find((option) => option.value === value)
+      if (!selectedOption) {
+        return topOptions
+      }
+
+      return [selectedOption, ...topOptions].slice(0, 20)
     }
 
     return available
@@ -53,7 +63,7 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
         return haystack.includes(normalized)
       })
       .slice(0, 250)
-  }, [available, query])
+  }, [available, query, value])
 
   const selectedFlag = getFlagComponent(selected?.countryCode)
 
@@ -111,12 +121,6 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
                       setOpen(false)
                     }}
                   >
-                    <Check
-                      className={cn(
-                        'mr-2 size-4',
-                        value === option.value ? 'opacity-100' : 'opacity-0',
-                      )}
-                    />
                     {flag ? (
                       createElement(flag, { className: 'mr-2 size-4 rounded-xs', 'aria-hidden': true })
                     ) : (
