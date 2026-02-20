@@ -38,7 +38,36 @@ function App() {
   ])
   const [warning, setWarning] = useState<string | undefined>(undefined)
 
-  const timeZoneOptions = useMemo(() => buildTimeZoneOptions(primaryDateTimeUtc), [primaryDateTimeUtc])
+  const timeZoneReferenceYear = primaryDateTimeUtc.year
+  const timeZoneReferenceMonth = primaryDateTimeUtc.month
+  const timeZoneReferenceDay = primaryDateTimeUtc.day
+  const timeZoneReferenceHour = primaryDateTimeUtc.hour
+  const timeZoneReferenceMinute = primaryDateTimeUtc.minute
+
+  const timeZoneOptions = useMemo(
+    () =>
+      buildTimeZoneOptions(
+        DateTime.fromObject(
+          {
+            year: timeZoneReferenceYear,
+            month: timeZoneReferenceMonth,
+            day: timeZoneReferenceDay,
+            hour: timeZoneReferenceHour,
+            minute: timeZoneReferenceMinute,
+            second: 0,
+            millisecond: 0,
+          },
+          { zone: 'utc' },
+        ),
+      ),
+    [
+      timeZoneReferenceYear,
+      timeZoneReferenceMonth,
+      timeZoneReferenceDay,
+      timeZoneReferenceHour,
+      timeZoneReferenceMinute,
+    ],
+  )
   const applyLocalParts = (parts: {
     year: number
     month: number

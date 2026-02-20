@@ -24,17 +24,39 @@ type TimeZoneSelectProps = {
 
 export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }: TimeZoneSelectProps) {
   const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
 
   const selected = useMemo(() => options.find((option) => option.value === value), [options, value])
   const available = useMemo(
     () => options.filter((option) => !exclude.includes(option.value) || option.value === value),
     [exclude, options, value],
   )
+  const filtered = useMemo(() => {
+    const normalized = query.trim().toLowerCase()
+    if (!normalized) {
+      return available.slice(0, 250)
+    }
+
+    return available
+      .filter((option) => {
+        const haystack = `${option.label} ${option.value} ${option.city}`.toLowerCase()
+        return haystack.includes(normalized)
+      })
+      .slice(0, 250)
+  }, [available, query])
 
   return (
     <div className="grid gap-2">
       <span className="text-sm font-medium">{label}</span>
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover
+        open={open}
+        onOpenChange={(nextOpen) => {
+          setOpen(nextOpen)
+          if (!nextOpen) {
+            setQuery('')
+          }
+        }}
+      >
         <PopoverTrigger asChild>
           <Button
             variant="outline"
@@ -48,17 +70,22 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[320px] p-0" align="start" portalled={false}>
-          <Command>
-            <CommandInput placeholder="Search time zone..." />
+          <Command shouldFilter={false}>
+            <CommandInput
+              placeholder="Search time zone..."
+              value={query}
+              onValueChange={setQuery}
+            />
             <CommandList>
               <CommandEmpty>No time zone found.</CommandEmpty>
               <CommandGroup>
-                {available.map((option) => (
+                {filtered.map((option) => (
                   <CommandItem
                     key={option.value}
-                    value={`${option.value} ${option.label}`}
+                    value={option.value}
                     onSelect={() => {
                       onChange(option.value)
+                      setQuery('')
                       setOpen(false)
                     }}
                   >
