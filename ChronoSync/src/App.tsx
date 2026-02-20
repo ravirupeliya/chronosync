@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { DateTime } from 'luxon'
 import { Moon, Sun } from 'lucide-react'
+import logoDarkUrl from '@/assets/chronosync-logo-dark.svg'
+import logoLightUrl from '@/assets/chronosync-logo.svg'
 
 import { PrimaryClockPanel } from '@/components/primary-clock-panel'
 import { SecondaryClocksPanel } from '@/components/secondary-clocks-panel'
@@ -140,11 +142,16 @@ function App() {
     setTheme((current) => (current === 'dark' ? 'light' : 'dark'))
   }
 
+  const logoUrl = theme === 'dark' ? logoDarkUrl : logoLightUrl
+
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-4 pt-2 md:px-6 md:pb-6 md:pt-3 lg:px-8 lg:pb-8 lg:pt-4">
         <header className="flex items-center justify-between gap-4">
-          <h1 className="text-3xl font-bold tracking-tight">ChronoSync</h1>
+          <div className="flex items-center gap-3">
+            <img src={logoUrl} alt="ChronoSync logo" className="size-10 rounded-md" />
+            <h1 className="text-3xl font-bold tracking-tight">ChronoSync</h1>
+          </div>
           <Button
             variant="outline"
             size="icon"
