@@ -7,12 +7,7 @@ import logoLightUrl from '@/assets/chronosync-logo.svg'
 import { PrimaryClockPanel } from '@/components/primary-clock-panel'
 import { SecondaryClocksPanel } from '@/components/secondary-clocks-panel'
 import { Button } from '@/components/ui/button'
-import {
-  buildTimeZoneOptions,
-  buildUtcFromLocalParts,
-  formatPrimarySummary,
-  localPartsFromUtc,
-} from '@/lib/time-utils'
+import { buildTimeZoneOptions, buildUtcFromLocalParts, localPartsFromUtc } from '@/lib/time-utils'
 
 const DEFAULT_PRIMARY_ZONE = 'Pacific/Auckland'
 const THEME_STORAGE_KEY = 'chronosync-theme'
@@ -44,11 +39,6 @@ function App() {
   const [warning, setWarning] = useState<string | undefined>(undefined)
 
   const timeZoneOptions = useMemo(() => buildTimeZoneOptions(primaryDateTimeUtc), [primaryDateTimeUtc])
-  const primarySummary = useMemo(
-    () => formatPrimarySummary(primaryDateTimeUtc, primaryTimeZone),
-    [primaryDateTimeUtc, primaryTimeZone],
-  )
-
   const applyLocalParts = (parts: {
     year: number
     month: number
@@ -167,7 +157,6 @@ function App() {
           timeZone={primaryTimeZone}
           dateTimeUtc={primaryDateTimeUtc}
           options={timeZoneOptions}
-          summary={primarySummary}
           warning={warning}
           onTimeZoneChange={handlePrimaryZoneChange}
           onDateChange={handlePrimaryDateChange}

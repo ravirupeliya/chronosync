@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { DateTime } from 'luxon'
 
 import { AMPMToggle } from '@/components/am-pm-toggle'
@@ -12,7 +13,6 @@ type PrimaryClockPanelProps = {
   timeZone: string
   dateTimeUtc: DateTime
   options: TimeZoneOption[]
-  summary: string
   warning?: string
   onTimeZoneChange: (zone: string) => void
   onDateChange: (date: Date) => void
@@ -24,7 +24,6 @@ export function PrimaryClockPanel({
   timeZone,
   dateTimeUtc,
   options,
-  summary,
   warning,
   onTimeZoneChange,
   onDateChange,
@@ -33,26 +32,37 @@ export function PrimaryClockPanel({
 }: PrimaryClockPanelProps) {
   const local = dateTimeUtc.setZone(timeZone)
   const amPm = local.hour >= 12 ? 'PM' : 'AM'
+  const selectedCity = useMemo(() => {
+    const option = options.find((item) => item.value === timeZone)
+    if (option) {
+      return option.city
+    }
+
+    const segments = timeZone.split('/')
+    return segments[segments.length - 1].replace(/_/g, ' ')
+  }, [options, timeZone])
 
   return (
     <Card className="border-primary/40 shadow-sm">
-      <CardHeader className="space-y-3">
-        <div className="flex items-center justify-between gap-3">
-          <CardTitle className="text-2xl">Primary Clock</CardTitle>
+      <CardHeader className="space-y-0.5 pb-2">
+        <div className="flex items-start justify-between gap-3">
+          <div className="space-y-0.5">
+            <CardTitle className="text-xl font-semibold">{selectedCity}</CardTitle>
+            <CardDescription className="text-sm">{local.toFormat('ccc, dd LLL yyyy, h:mm:ss a')}</CardDescription>
+          </div>
           <Badge variant="secondary">Primary</Badge>
         </div>
-        <CardDescription className="text-sm">{summary}</CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-6 lg:grid-cols-[320px_1fr]">
-        <div className="flex flex-col items-center justify-center rounded-lg border bg-muted/30 p-4">
+      <CardContent className="grid gap-5 lg:grid-cols-[280px_1fr]">
+        <div className="flex flex-col items-center justify-center rounded-lg border bg-muted/30 p-3">
           <Clock
             dateTimeUtc={dateTimeUtc}
             timeZone={timeZone}
             interactive
-            size={280}
+            size={230}
             onTimeChange={onClockTimeChange}
           />
-          <div className="mt-3 text-center text-sm text-muted-foreground">
+          <div className="mt-2 text-center text-xs text-muted-foreground">
             Drag hour/minute hands to set the time
           </div>
         </div>
