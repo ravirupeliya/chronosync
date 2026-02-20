@@ -20,6 +20,7 @@ export function Clock({
 }: ClockProps) {
   const local = useMemo(() => dateTimeUtc.setZone(timeZone), [dateTimeUtc, timeZone])
   const [activeHand, setActiveHand] = useState<ActiveHand>(null)
+  const [hoveredHand, setHoveredHand] = useState<ActiveHand>(null)
   const svgRef = useRef<SVGSVGElement | null>(null)
 
   const center = size / 2
@@ -40,6 +41,14 @@ export function Clock({
 
   const minuteTip = toPolarPoint(minuteAngle, minuteLength)
   const hourTip = toPolarPoint(hourAngle, hourLength)
+  const handCursorClass = interactive
+    ? activeHand
+      ? 'cursor-grabbing'
+      : 'cursor-grab'
+    : ''
+
+  const hourIsEmphasized = activeHand === 'hour' || (!activeHand && hoveredHand === 'hour')
+  const minuteIsEmphasized = activeHand === 'minute' || (!activeHand && hoveredHand === 'minute')
 
   const getClockAngleFromPointer = (event: ReactPointerEvent<SVGSVGElement>): number => {
     const rect = svgRef.current?.getBoundingClientRect()
@@ -105,12 +114,18 @@ export function Clock({
 
     const selectedHand = pickHand(event)
     setActiveHand(selectedHand)
+    setHoveredHand(selectedHand)
     event.currentTarget.setPointerCapture(event.pointerId)
     updateTimeFromAngle(getClockAngleFromPointer(event), selectedHand)
   }
 
   const handlePointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
-    if (!interactive || !activeHand) {
+    if (!interactive) {
+      return
+    }
+
+    if (!activeHand) {
+      setHoveredHand(pickHand(event))
       return
     }
 
@@ -124,6 +139,24 @@ export function Clock({
 
     event.currentTarget.releasePointerCapture(event.pointerId)
     setActiveHand(null)
+    setHoveredHand(null)
+  }
+
+  const handlePointerCancel = () => {
+    if (!interactive) {
+      return
+    }
+
+    setActiveHand(null)
+    setHoveredHand(null)
+  }
+
+  const handlePointerLeave = () => {
+    if (!interactive || activeHand) {
+      return
+    }
+
+    setHoveredHand(null)
   }
 
   return (
@@ -132,12 +165,14 @@ export function Clock({
       width={size}
       height={size}
       viewBox={`0 0 ${size} ${size}`}
-      className={interactive ? 'touch-none cursor-pointer' : ''}
+      className={interactive ? (activeHand ? 'touch-none cursor-grabbing' : 'touch-none') : ''}
       role={interactive ? 'slider' : 'img'}
       aria-label={`Analog clock for ${timeZone}`}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
+      onPointerLeave={handlePointerLeave}
     >
       <circle cx={center} cy={center} r={radius} className="fill-card stroke-border" strokeWidth={2} />
 
@@ -168,8 +203,9 @@ export function Clock({
         y1={center}
         x2={hourTip.x}
         y2={hourTip.y}
-        className="stroke-primary"
-        strokeWidth={6}
+        className={`stroke-primary ${hourIsEmphasized ? 'opacity-100' : 'opacity-85'} ${handCursorClass}`}
+        style={{ transition: 'opacity 150ms ease-out, stroke-width 150ms ease-out' }}
+        strokeWidth={hourIsEmphasized ? 7 : 6}
         strokeLinecap="round"
       />
       <line
@@ -177,8 +213,9 @@ export function Clock({
         y1={center}
         x2={minuteTip.x}
         y2={minuteTip.y}
-        className="stroke-foreground"
-        strokeWidth={4}
+        className={`stroke-foreground ${minuteIsEmphasized ? 'opacity-100' : 'opacity-85'} ${handCursorClass}`}
+        style={{ transition: 'opacity 150ms ease-out, stroke-width 150ms ease-out' }}
+        strokeWidth={minuteIsEmphasized ? 5 : 4}
         strokeLinecap="round"
       />
       <circle cx={center} cy={center} r={5} className="fill-primary" />
