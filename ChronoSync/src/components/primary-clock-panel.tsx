@@ -3,6 +3,7 @@ import { DateTime } from 'luxon'
 
 import { AMPMToggle } from '@/components/am-pm-toggle'
 import { Clock } from '@/components/clock'
+import { CountryFlag } from '@/components/country-flag'
 import { DatePickerControl } from '@/components/date-picker-control'
 import { TimeZoneSelect } from '@/components/time-zone-select'
 import { Badge } from '@/components/ui/badge'
@@ -31,14 +32,17 @@ export function PrimaryClockPanel({
 }: PrimaryClockPanelProps) {
   const local = dateTimeUtc.setZone(timeZone)
   const amPm = local.hour >= 12 ? 'PM' : 'AM'
-  const selectedCity = useMemo(() => {
+  const selectedOption = useMemo(() => {
     const option = options.find((item) => item.value === timeZone)
     if (option) {
-      return option.city
+      return option
     }
 
     const segments = timeZone.split('/')
-    return segments[segments.length - 1].replace(/_/g, ' ')
+    return {
+      city: segments[segments.length - 1].replace(/_/g, ' '),
+      countryCode: undefined,
+    }
   }, [options, timeZone])
 
   return (
@@ -46,7 +50,10 @@ export function PrimaryClockPanel({
       <div>
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-0.5">
-            <h2 className="text-xl font-semibold">{selectedCity}</h2>
+            <h2 className="flex items-center gap-2 text-xl font-semibold">
+              <CountryFlag countryCode={selectedOption.countryCode} className="size-5 rounded-xs" />
+              <span>{selectedOption.city}</span>
+            </h2>
             <p className="text-sm text-muted-foreground">{local.toFormat('ccc, dd LLL yyyy, h:mm:ss a')}</p>
           </div>
           <Badge variant="secondary">Primary</Badge>

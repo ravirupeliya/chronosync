@@ -3,6 +3,7 @@ import { DateTime } from 'luxon'
 import { Plus, Trash2 } from 'lucide-react'
 
 import { Clock } from '@/components/clock'
+import { CountryFlag } from '@/components/country-flag'
 import { TimeZoneSelect } from '@/components/time-zone-select'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -119,7 +120,10 @@ export function SecondaryClocksPanel({
                 <div key={zone} className="rounded-xl border bg-card p-4">
                   <div className="mb-3 flex items-start justify-between gap-2">
                     <div>
-                      <div className="text-sm font-semibold">{option?.city ?? zone}</div>
+                      <div className="flex items-center gap-2 text-sm font-semibold">
+                        <CountryFlag countryCode={option?.countryCode} className="size-4 rounded-xs" />
+                        <span>{option?.city ?? zone}</span>
+                      </div>
                       <div className="text-xs text-muted-foreground">{zone}</div>
                     </div>
                     <div className="flex items-center gap-2">

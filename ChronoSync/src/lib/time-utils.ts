@@ -5,6 +5,7 @@ export type TimeZoneOption = {
   value: string
   city: string
   country: string
+  countryCode?: string
   offsetLabel: string
   label: string
 }
@@ -64,12 +65,15 @@ const getCountryName = (zone: string): string => {
   return ct.getCountry(countryCode)?.name ?? 'Global'
 }
 
+const getCountryCode = (zone: string): string | undefined => ct.getTimezone(zone)?.countries?.[0]
+
 export const buildTimeZoneOptions = (referenceUtc: DateTime): TimeZoneOption[] =>
   getIanaTimeZones()
     .map((zone) => {
       const zoned = referenceUtc.setZone(zone)
       const city = getCityName(zone)
       const country = getCountryName(zone)
+      const countryCode = getCountryCode(zone)
       const offsetLabel = formatOffset(zoned.offset)
 
       return {
@@ -77,15 +81,17 @@ export const buildTimeZoneOptions = (referenceUtc: DateTime): TimeZoneOption[] =
         value: zone,
         city,
         country,
+        countryCode,
         offsetLabel,
         label: `${city}, ${country} (${offsetLabel})`,
       }
     })
     .sort((a, b) => a.offsetMinutes - b.offsetMinutes || a.label.localeCompare(b.label))
-    .map(({ value, city, country, offsetLabel, label }) => ({
+    .map(({ value, city, country, countryCode, offsetLabel, label }) => ({
       value,
       city,
       country,
+      countryCode,
       offsetLabel,
       label,
     }))
