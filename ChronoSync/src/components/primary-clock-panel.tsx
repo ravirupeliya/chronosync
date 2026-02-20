@@ -6,7 +6,6 @@ import { Clock } from '@/components/clock'
 import { DatePickerControl } from '@/components/date-picker-control'
 import { TimeZoneSelect } from '@/components/time-zone-select'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import type { TimeZoneOption } from '@/lib/time-utils'
 
 type PrimaryClockPanelProps = {
@@ -43,17 +42,17 @@ export function PrimaryClockPanel({
   }, [options, timeZone])
 
   return (
-    <Card className="border-primary/40 shadow-sm">
-      <CardHeader className="space-y-0.5 pb-2">
+    <section className="space-y-3">
+      <div>
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-0.5">
-            <CardTitle className="text-xl font-semibold">{selectedCity}</CardTitle>
-            <CardDescription className="text-sm">{local.toFormat('ccc, dd LLL yyyy, h:mm:ss a')}</CardDescription>
+            <h2 className="text-xl font-semibold">{selectedCity}</h2>
+            <p className="text-sm text-muted-foreground">{local.toFormat('ccc, dd LLL yyyy, h:mm:ss a')}</p>
           </div>
           <Badge variant="secondary">Primary</Badge>
         </div>
-      </CardHeader>
-      <CardContent className="grid gap-5 lg:grid-cols-[280px_1fr]">
+      </div>
+      <div className="grid gap-5 lg:grid-cols-[280px_1fr]">
         <div className="flex flex-col items-center justify-center rounded-lg border bg-muted/30 p-3">
           <Clock
             dateTimeUtc={dateTimeUtc}
@@ -90,7 +89,7 @@ export function PrimaryClockPanel({
             </div>
           ) : null}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   )
 }
