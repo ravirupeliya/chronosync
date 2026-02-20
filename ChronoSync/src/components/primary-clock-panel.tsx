@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { DateTime } from 'luxon'
+import { Hand } from 'lucide-react'
 
 import { AMPMToggle } from '@/components/am-pm-toggle'
 import { Clock } from '@/components/clock'
@@ -60,7 +61,7 @@ export function PrimaryClockPanel({
         </div>
       </div>
       <div className="grid gap-5 lg:grid-cols-[280px_1fr]">
-        <div className="flex cursor-pointer flex-col items-center justify-center rounded-lg border bg-muted/30 p-3">
+        <div className="flex flex-col items-center justify-center rounded-lg border bg-muted/30 p-3">
           <Clock
             dateTimeUtc={dateTimeUtc}
             timeZone={timeZone}
@@ -68,8 +69,9 @@ export function PrimaryClockPanel({
             size={230}
             onTimeChange={onClockTimeChange}
           />
-          <div className="mt-2 text-center text-xs text-muted-foreground">
-            Drag hour/minute hands to set the time
+          <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+            <Hand className="size-3.5" />
+            <span>Drag clock hands to set time</span>
           </div>
         </div>
 

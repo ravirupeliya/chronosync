@@ -140,7 +140,7 @@ export function SecondaryClocksPanel({
                   </div>
 
                   <div className="flex justify-center">
-                    <Clock dateTimeUtc={primaryDateTimeUtc} timeZone={zone} size={170} />
+                    <Clock dateTimeUtc={primaryDateTimeUtc} timeZone={zone} size={180} />
                   </div>
 
                   <div className="mt-3 text-center text-sm font-medium">{local.toFormat('ccc, dd LLL yyyy')}</div>

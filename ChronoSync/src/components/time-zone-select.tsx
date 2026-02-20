@@ -22,6 +22,10 @@ type TimeZoneSelectProps = {
   exclude?: string[]
 }
 
+const INITIAL_VISIBLE_COUNT = 60
+const LOAD_MORE_COUNT = 60
+const LOAD_MORE_THRESHOLD_PX = 24
+
 const getFlagComponent = (countryCode?: string): ComponentType<SVGProps<SVGSVGElement>> | null => {
   if (!countryCode || countryCode.length !== 2) {
     return null
@@ -37,6 +41,7 @@ const formatCountryCode = (countryCode?: string): string =>
 export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }: TimeZoneSelectProps) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT)
 
   const selected = useMemo(() => options.find((option) => option.value === value), [options, value])
   const available = useMemo(
@@ -46,17 +51,16 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase()
     if (!normalized) {
-      const topOptions = available.slice(0, 20)
-      if (!value || topOptions.some((option) => option.value === value)) {
-        return topOptions
+      if (!value) {
+        return available
       }
 
       const selectedOption = available.find((option) => option.value === value)
       if (!selectedOption) {
-        return topOptions
+        return available
       }
 
-      return [selectedOption, ...topOptions].slice(0, 20)
+      return [selectedOption, ...available.filter((option) => option.value !== value)]
     }
 
     return available
@@ -64,8 +68,18 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
         const haystack = `${option.label} ${option.city} ${option.country}`.toLowerCase()
         return haystack.includes(normalized)
       })
-      .slice(0, 250)
   }, [available, query, value])
+
+  const visibleOptions = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount])
+
+  const handleListScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    const target = event.currentTarget
+    const remaining = target.scrollHeight - target.scrollTop - target.clientHeight
+
+    if (remaining <= LOAD_MORE_THRESHOLD_PX) {
+      setVisibleCount((current) => Math.min(current + LOAD_MORE_COUNT, filtered.length))
+    }
+  }
 
   const selectedFlag = getFlagComponent(selected?.countryCode)
 
@@ -76,6 +90,7 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
         open={open}
         onOpenChange={(nextOpen) => {
           setOpen(nextOpen)
+          setVisibleCount(INITIAL_VISIBLE_COUNT)
           if (!nextOpen) {
             setQuery('')
           }
@@ -106,12 +121,15 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
             <CommandInput
               placeholder="Search time zone..."
               value={query}
-              onValueChange={setQuery}
+              onValueChange={(nextQuery) => {
+                setQuery(nextQuery)
+                setVisibleCount(INITIAL_VISIBLE_COUNT)
+              }}
             />
-            <CommandList>
+            <CommandList onScroll={handleListScroll}>
               <CommandEmpty>No time zone found.</CommandEmpty>
               <CommandGroup>
-                {filtered.map((option) => {
+                {visibleOptions.map((option) => {
                   const flag = getFlagComponent(option.countryCode)
 
                   return (

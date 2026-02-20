@@ -177,13 +177,13 @@ export function Clock({
       onPointerCancel={handlePointerCancel}
       onPointerLeave={handlePointerLeave}
     >
-      <circle cx={center} cy={center} r={radius} className="fill-card stroke-border" strokeWidth={2} />
+      <circle cx={center} cy={center} r={radius} className={interactive ? 'fill-card stroke-border cursor-pointer': 'fill-card stroke-border'} strokeWidth={2} />
 
       {Array.from({ length: 60 }).map((_, index) => {
         const isQuarter = index % 15 === 0
         const isHourMarker = index % 5 === 0
         const outer = radius - 4
-        const inner = outer - (isQuarter ? 12 : isHourMarker ? 8 : 4)
+        const inner = outer - (isQuarter ? 24 : isHourMarker ? 8 : 4)
 
         const outerPoint = toPolarPoint(index * 6, outer)
         const innerPoint = toPolarPoint(index * 6, inner)
