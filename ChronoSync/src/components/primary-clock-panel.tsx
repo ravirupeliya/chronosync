@@ -53,7 +53,7 @@ export function PrimaryClockPanel({
         </div>
       </div>
       <div className="grid gap-5 lg:grid-cols-[280px_1fr]">
-        <div className="flex flex-col items-center justify-center rounded-lg border bg-muted/30 p-3">
+        <div className="flex cursor-pointer flex-col items-center justify-center rounded-lg border bg-muted/30 p-3">
           <Clock
             dateTimeUtc={dateTimeUtc}
             timeZone={timeZone}
