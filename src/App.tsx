@@ -11,6 +11,8 @@ import { buildTimeZoneOptions, buildUtcFromLocalParts, localPartsFromUtc } from 
 
 const DEFAULT_PRIMARY_ZONE = 'Pacific/Auckland'
 const THEME_STORAGE_KEY = 'chronosync-theme'
+const SECONDARY_CLOCKS_STORAGE_KEY = 'chronosync-secondary-clocks'
+const DEFAULT_SECONDARY_TIME_ZONES = ['America/New_York', 'Europe/London', 'Asia/Tokyo']
 
 type Theme = 'light' | 'dark'
 
@@ -27,15 +29,40 @@ const getInitialTheme = (): Theme => {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
+const getInitialSecondaryTimeZones = (): string[] => {
+  if (typeof window === 'undefined') {
+    return DEFAULT_SECONDARY_TIME_ZONES
+  }
+
+  const saved = window.localStorage.getItem(SECONDARY_CLOCKS_STORAGE_KEY)
+  if (!saved) {
+    return DEFAULT_SECONDARY_TIME_ZONES
+  }
+
+  try {
+    const parsed = JSON.parse(saved)
+    if (!Array.isArray(parsed)) {
+      return DEFAULT_SECONDARY_TIME_ZONES
+    }
+
+    const uniqueZones = new Set<string>()
+    for (const zone of parsed) {
+      if (typeof zone === 'string' && zone.trim().length > 0) {
+        uniqueZones.add(zone)
+      }
+    }
+
+    return Array.from(uniqueZones)
+  } catch {
+    return DEFAULT_SECONDARY_TIME_ZONES
+  }
+}
+
 function App() {
   const [theme, setTheme] = useState<Theme>(getInitialTheme)
   const [primaryTimeZone, setPrimaryTimeZone] = useState(DEFAULT_PRIMARY_ZONE)
   const [primaryDateTimeUtc, setPrimaryDateTimeUtc] = useState(() => DateTime.now().toUTC().startOf('minute'))
-  const [secondaryTimeZones, setSecondaryTimeZones] = useState<string[]>([
-    'America/New_York',
-    'Europe/London',
-    'Asia/Tokyo',
-  ])
+  const [secondaryTimeZones, setSecondaryTimeZones] = useState<string[]>(getInitialSecondaryTimeZones)
   const [warning, setWarning] = useState<string | undefined>(undefined)
 
   const timeZoneReferenceYear = primaryDateTimeUtc.year
@@ -152,6 +179,10 @@ function App() {
     document.documentElement.classList.toggle('dark', theme === 'dark')
     window.localStorage.setItem(THEME_STORAGE_KEY, theme)
   }, [theme])
+
+  useEffect(() => {
+    window.localStorage.setItem(SECONDARY_CLOCKS_STORAGE_KEY, JSON.stringify(secondaryTimeZones))
+  }, [secondaryTimeZones])
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
