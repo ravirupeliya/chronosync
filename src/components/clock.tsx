@@ -22,6 +22,7 @@ export function Clock({
   const [activeHand, setActiveHand] = useState<ActiveHand>(null)
   const [hoveredHand, setHoveredHand] = useState<ActiveHand>(null)
   const svgRef = useRef<SVGSVGElement | null>(null)
+  const dragTimeRef = useRef<{ hour24: number; minute: number } | null>(null)
 
   const center = size / 2
   const radius = size / 2 - 10
@@ -44,6 +45,18 @@ export function Clock({
   const minuteTip = toPolarPoint(minuteAngle, minuteLength)
   const hourTip = toPolarPoint(hourAngle, hourLength)
   const secondTip = toPolarPoint(secondAngle, secondLength)
+
+  const normalizeHour24 = (hour: number) => ((hour % 24) + 24) % 24
+
+  const getDragTime = () => dragTimeRef.current ?? { hour24: local.hour, minute: local.minute }
+
+  const setDragTime = (hour24: number, minute: number) => {
+    dragTimeRef.current = {
+      hour24: normalizeHour24(hour24),
+      minute: ((minute % 60) + 60) % 60,
+    }
+  }
+
   const handCursorClass = interactive
     ? activeHand
       ? 'cursor-grabbing'
@@ -95,19 +108,31 @@ export function Clock({
 
     if (hand === 'minute') {
       const minute = Math.round(angle / 6) % 60
-      onTimeChange(local.hour, minute)
+      const current = getDragTime()
+      let hour24 = current.hour24
+
+      if (current.minute >= 45 && minute <= 14) {
+        hour24 = normalizeHour24(hour24 + 1)
+      } else if (current.minute <= 14 && minute >= 45) {
+        hour24 = normalizeHour24(hour24 - 1)
+      }
+
+      setDragTime(hour24, minute)
+      onTimeChange(hour24, minute)
       return
     }
 
+    const current = getDragTime()
     const hour12 = Math.round(angle / 30) % 12
     const candidates = [hour12, hour12 + 12]
     const closest = candidates.reduce((best, candidate) => {
-      const currentDiff = Math.abs(candidate - local.hour)
-      const bestDiff = Math.abs(best - local.hour)
+      const currentDiff = Math.abs(candidate - current.hour24)
+      const bestDiff = Math.abs(best - current.hour24)
       return currentDiff < bestDiff ? candidate : best
     }, candidates[0])
 
-    onTimeChange(closest, local.minute)
+    setDragTime(closest, current.minute)
+    onTimeChange(closest, current.minute)
   }
 
   const handlePointerDown = (event: ReactPointerEvent<SVGSVGElement>) => {
@@ -118,6 +143,7 @@ export function Clock({
     const selectedHand = pickHand(event)
     setActiveHand(selectedHand)
     setHoveredHand(selectedHand)
+    setDragTime(local.hour, local.minute)
     event.currentTarget.setPointerCapture(event.pointerId)
     updateTimeFromAngle(getClockAngleFromPointer(event), selectedHand)
   }
@@ -143,6 +169,7 @@ export function Clock({
     event.currentTarget.releasePointerCapture(event.pointerId)
     setActiveHand(null)
     setHoveredHand(null)
+    dragTimeRef.current = null
   }
 
   const handlePointerCancel = () => {
@@ -152,6 +179,7 @@ export function Clock({
 
     setActiveHand(null)
     setHoveredHand(null)
+    dragTimeRef.current = null
   }
 
   const handlePointerLeave = () => {
