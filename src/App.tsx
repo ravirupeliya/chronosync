@@ -175,6 +175,10 @@ function App() {
     setSecondaryTimeZones([])
   }
 
+  const handleReorderSecondaryClocks = (zones: string[]) => {
+    setSecondaryTimeZones(zones)
+  }
+
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark')
     window.localStorage.setItem(THEME_STORAGE_KEY, theme)
@@ -236,6 +240,7 @@ function App() {
           onAddClock={handleAddSecondaryClock}
           onRemoveClock={handleRemoveSecondaryClock}
           onClearAllClocks={handleClearAllSecondaryClocks}
+          onReorderClocks={handleReorderSecondaryClocks}
         />
       </div>
     </main>

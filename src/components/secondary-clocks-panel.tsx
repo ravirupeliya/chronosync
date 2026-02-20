@@ -1,4 +1,23 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import {
+  closestCenter,
+  DndContext,
+  DragOverlay,
+  type DragEndEvent,
+  type DragStartEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  rectSortingStrategy,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { DateTime } from 'luxon'
 import { Plus, Trash2 } from 'lucide-react'
 
@@ -27,6 +46,94 @@ type SecondaryClocksPanelProps = {
   onAddClock: (zone: string) => void
   onRemoveClock: (zone: string) => void
   onClearAllClocks: () => void
+  onReorderClocks: (zones: string[]) => void
+}
+
+type SecondaryClockCardProps = {
+  zone: string
+  primaryDateTimeUtc: DateTime
+  option?: TimeZoneOption
+  onRemoveClock: (zone: string) => void
+}
+
+function SecondaryClockCard({ zone, primaryDateTimeUtc, option, onRemoveClock }: SecondaryClockCardProps) {
+  const local = primaryDateTimeUtc.setZone(zone)
+
+  return (
+    <>
+      <div className="mb-3 flex items-start justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-2 text-sm font-semibold">
+            <CountryFlag countryCode={option?.countryCode} className="size-4 rounded-xs" />
+            <span>{option?.city ?? zone}</span>
+          </div>
+          <div className="text-xs text-muted-foreground">{zone}</div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline">{option?.offsetLabel ?? ''}</Badge>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={`Remove ${zone}`}
+            onClick={() => onRemoveClock(zone)}
+          >
+            <Trash2 className="size-4" />
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex justify-center">
+        <Clock dateTimeUtc={primaryDateTimeUtc} timeZone={zone} size={180} />
+      </div>
+
+      <div className="mt-3 text-center text-sm font-medium">{local.toFormat('ccc, dd LLL yyyy')}</div>
+      <div className="text-center text-lg font-semibold">{local.toFormat('h:mm a')}</div>
+    </>
+  )
+}
+
+type SortableClockCardProps = SecondaryClockCardProps & {
+  showPlaceholder: boolean
+}
+
+function SortableClockCard({
+  zone,
+  primaryDateTimeUtc,
+  option,
+  onRemoveClock,
+  showPlaceholder,
+}: SortableClockCardProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: zone })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  return (
+    <div ref={setNodeRef} style={style} className="touch-none">
+      {showPlaceholder ? (
+        <div className="flex min-h-80.5 items-center justify-center rounded-xl border border-dashed border-primary/60 bg-muted/30 p-4 text-sm text-muted-foreground">
+          Drop to place clock
+        </div>
+      ) : (
+        <div
+          {...attributes}
+          {...listeners}
+          aria-label={`Drag to reorder ${zone}`}
+          className={`rounded-xl border bg-card p-4 ${isDragging ? 'cursor-grabbing' : 'cursor-move'}`}
+        >
+          <SecondaryClockCard
+            zone={zone}
+            primaryDateTimeUtc={primaryDateTimeUtc}
+            option={option}
+            onRemoveClock={onRemoveClock}
+          />
+        </div>
+      )}
+      {isDragging ? <span className="sr-only">Dragging {zone}</span> : null}
+    </div>
+  )
 }
 
 export function SecondaryClocksPanel({
@@ -37,9 +144,21 @@ export function SecondaryClocksPanel({
   onAddClock,
   onRemoveClock,
   onClearAllClocks,
+  onReorderClocks,
 }: SecondaryClocksPanelProps) {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [pendingZone, setPendingZone] = useState('')
+  const [activeZone, setActiveZone] = useState<string | null>(null)
+  const [previewOrder, setPreviewOrder] = useState<string[] | null>(null)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  )
 
   const optionsMap = useMemo(
     () => new Map(options.map((option) => [option.value, option])),
@@ -54,6 +173,67 @@ export function SecondaryClocksPanel({
     onAddClock(pendingZone)
     setPendingZone('')
     setDialogOpen(false)
+  }
+
+  const visibleOrder = previewOrder ?? secondaryTimeZones
+
+  useEffect(() => {
+    if (!activeZone) {
+      document.body.style.cursor = ''
+      document.documentElement.style.cursor = ''
+      return
+    }
+
+    document.body.style.cursor = 'grabbing'
+    document.documentElement.style.cursor = 'grabbing'
+
+    return () => {
+      document.body.style.cursor = ''
+      document.documentElement.style.cursor = ''
+    }
+  }, [activeZone])
+
+  const handleDragStart = (event: DragStartEvent) => {
+    if (typeof event.active.id === 'string') {
+      setActiveZone(event.active.id)
+      setPreviewOrder(secondaryTimeZones)
+    }
+  }
+
+  const handleDragOver = (activeId: string, overId: string) => {
+    setPreviewOrder((current) => {
+      const base = current ?? secondaryTimeZones
+      const oldIndex = base.indexOf(activeId)
+      const newIndex = base.indexOf(overId)
+
+      if (oldIndex < 0 || newIndex < 0 || oldIndex === newIndex) {
+        return base
+      }
+
+      return arrayMove(base, oldIndex, newIndex)
+    })
+  }
+
+  const resetDragState = () => {
+    setActiveZone(null)
+    setPreviewOrder(null)
+  }
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const activeId = typeof event.active.id === 'string' ? event.active.id : null
+    const overId = typeof event.over?.id === 'string' ? event.over.id : null
+
+    if (!activeId || !overId) {
+      resetDragState()
+      return
+    }
+
+    const nextOrder = previewOrder ?? secondaryTimeZones
+    if (nextOrder.join('|') !== secondaryTimeZones.join('|')) {
+      onReorderClocks(nextOrder)
+    }
+
+    resetDragState()
   }
 
   return (
@@ -128,44 +308,51 @@ export function SecondaryClocksPanel({
             No secondary clocks yet. Add a clock to compare regions.
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {secondaryTimeZones.map((zone) => {
-              const local = primaryDateTimeUtc.setZone(zone)
-              const option = optionsMap.get(zone)
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragOver={(event) => {
+              const activeId = typeof event.active.id === 'string' ? event.active.id : null
+              const overId = typeof event.over?.id === 'string' ? event.over.id : null
 
-              return (
-                <div key={zone} className="rounded-xl border bg-card p-4">
-                  <div className="mb-3 flex items-start justify-between gap-2">
-                    <div>
-                      <div className="flex items-center gap-2 text-sm font-semibold">
-                        <CountryFlag countryCode={option?.countryCode} className="size-4 rounded-xs" />
-                        <span>{option?.city ?? zone}</span>
-                      </div>
-                      <div className="text-xs text-muted-foreground">{zone}</div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline">{option?.offsetLabel ?? ''}</Badge>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label={`Remove ${zone}`}
-                        onClick={() => onRemoveClock(zone)}
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
-                    </div>
-                  </div>
+              if (!activeId || !overId || activeId === overId) {
+                return
+              }
 
-                  <div className="flex justify-center">
-                    <Clock dateTimeUtc={primaryDateTimeUtc} timeZone={zone} size={180} />
-                  </div>
+              handleDragOver(activeId, overId)
+            }}
+            onDragEnd={handleDragEnd}
+            onDragCancel={resetDragState}
+          >
+            <SortableContext items={visibleOrder} strategy={rectSortingStrategy}>
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {visibleOrder.map((zone) => (
+                  <SortableClockCard
+                    key={zone}
+                    zone={zone}
+                    primaryDateTimeUtc={primaryDateTimeUtc}
+                    option={optionsMap.get(zone)}
+                    onRemoveClock={onRemoveClock}
+                    showPlaceholder={activeZone === zone}
+                  />
+                ))}
+              </div>
+            </SortableContext>
 
-                  <div className="mt-3 text-center text-sm font-medium">{local.toFormat('ccc, dd LLL yyyy')}</div>
-                  <div className="text-center text-lg font-semibold">{local.toFormat('h:mm a')}</div>
+            <DragOverlay>
+              {activeZone ? (
+                <div className="w-full max-w-[320px] rounded-xl border border-primary/40 bg-card p-4 shadow-xl">
+                  <SecondaryClockCard
+                    zone={activeZone}
+                    primaryDateTimeUtc={primaryDateTimeUtc}
+                    option={optionsMap.get(activeZone)}
+                    onRemoveClock={onRemoveClock}
+                  />
                 </div>
-              )
-            })}
-          </div>
+              ) : null}
+            </DragOverlay>
+          </DndContext>
         )}
       </CardContent>
     </Card>
