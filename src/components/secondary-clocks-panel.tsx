@@ -69,7 +69,7 @@ function SecondaryClockCard({ zone, primaryDateTimeUtc, option, onRemoveClock }:
           </div>
           <div className="text-xs text-muted-foreground">{zone}</div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <Badge variant="outline">{option?.offsetLabel ?? ''}</Badge>
           <Button
             variant="ghost"
@@ -302,7 +302,7 @@ export function SecondaryClocksPanel({
         </div>
       </CardHeader>
 
-      <CardContent className="pt-3">
+      <CardContent className="pt-3 px-3 lg:px-6">
         {secondaryTimeZones.length === 0 ? (
           <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
             No secondary clocks yet. Add a clock to compare regions.
