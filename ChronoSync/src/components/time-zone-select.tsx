@@ -34,12 +34,12 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase()
     if (!normalized) {
-      return available.slice(0, 250)
+      return available.slice(0, 20)
     }
 
     return available
       .filter((option) => {
-        const haystack = `${option.label} ${option.value} ${option.city}`.toLowerCase()
+        const haystack = `${option.label} ${option.city} ${option.country}`.toLowerCase()
         return haystack.includes(normalized)
       })
       .slice(0, 250)
@@ -69,7 +69,7 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
             <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[320px] p-0" align="start" portalled={false}>
+        <PopoverContent className="w-120 p-0" align="start" portalled={false}>
           <Command shouldFilter={false}>
             <CommandInput
               placeholder="Search time zone..."

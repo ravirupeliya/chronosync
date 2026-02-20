@@ -1,8 +1,10 @@
 import { DateTime } from 'luxon'
+import * as ct from 'countries-and-timezones'
 
 export type TimeZoneOption = {
   value: string
   city: string
+  country: string
   offsetLabel: string
   label: string
 }
@@ -52,21 +54,41 @@ const getCityName = (zone: string): string => {
   return lastSegment.replace(/_/g, ' ')
 }
 
+const getCountryName = (zone: string): string => {
+  const timezone = ct.getTimezone(zone)
+  const countryCode = timezone?.countries?.[0]
+  if (!countryCode) {
+    return 'Global'
+  }
+
+  return ct.getCountry(countryCode)?.name ?? 'Global'
+}
+
 export const buildTimeZoneOptions = (referenceUtc: DateTime): TimeZoneOption[] =>
   getIanaTimeZones()
     .map((zone) => {
       const zoned = referenceUtc.setZone(zone)
       const city = getCityName(zone)
+      const country = getCountryName(zone)
       const offsetLabel = formatOffset(zoned.offset)
 
       return {
+        offsetMinutes: zoned.offset,
         value: zone,
         city,
+        country,
         offsetLabel,
-        label: `${city} (${offsetLabel})`,
+        label: `${city}, ${country} (${offsetLabel})`,
       }
     })
-    .sort((a, b) => a.label.localeCompare(b.label))
+    .sort((a, b) => a.offsetMinutes - b.offsetMinutes || a.label.localeCompare(b.label))
+    .map(({ value, city, country, offsetLabel, label }) => ({
+      value,
+      city,
+      country,
+      offsetLabel,
+      label,
+    }))
 
 export const localPartsFromUtc = (dateTimeUtc: DateTime, zone: string): LocalDateTimeParts => {
   const local = dateTimeUtc.setZone(zone)
