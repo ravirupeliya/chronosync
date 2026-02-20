@@ -6,7 +6,8 @@ import {
   type DragEndEvent,
   type DragStartEvent,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
@@ -111,7 +112,7 @@ function SortableClockCard({
   }
 
   return (
-    <div ref={setNodeRef} style={style} className="touch-none">
+    <div ref={setNodeRef} style={style} className="touch-pan-y">
       {showPlaceholder ? (
         <div className="flex min-h-80.5 items-center justify-center rounded-xl border border-dashed border-primary/60 bg-muted/30 p-4 text-sm text-muted-foreground">
           Drop to place clock
@@ -152,8 +153,11 @@ export function SecondaryClocksPanel({
   const [previewOrder, setPreviewOrder] = useState<string[] | null>(null)
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: { distance: 8 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 180, tolerance: 10 },
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
