@@ -128,6 +128,14 @@ function App() {
     window.localStorage.setItem(THEME_STORAGE_KEY, theme)
   }, [theme])
 
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setPrimaryDateTimeUtc((previous) => previous.plus({ seconds: 1 }))
+    }, 1000)
+
+    return () => window.clearInterval(intervalId)
+  }, [])
+
   const toggleTheme = () => {
     setTheme((current) => (current === 'dark' ? 'light' : 'dark'))
   }

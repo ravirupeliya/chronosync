@@ -27,9 +27,11 @@ export function Clock({
   const radius = size / 2 - 10
   const minuteLength = radius * 0.72
   const hourLength = radius * 0.52
+  const secondLength = radius * 0.8
 
   const minuteAngle = local.minute * 6
   const hourAngle = ((local.hour % 12) + local.minute / 60) * 30
+  const secondAngle = local.second * 6
 
   const toPolarPoint = (angleDeg: number, length: number) => {
     const rad = ((angleDeg - 90) * Math.PI) / 180
@@ -41,6 +43,7 @@ export function Clock({
 
   const minuteTip = toPolarPoint(minuteAngle, minuteLength)
   const hourTip = toPolarPoint(hourAngle, hourLength)
+  const secondTip = toPolarPoint(secondAngle, secondLength)
   const handCursorClass = interactive
     ? activeHand
       ? 'cursor-grabbing'
@@ -198,6 +201,28 @@ export function Clock({
         )
       })}
 
+      {/* {[
+        { value: '12', angle: 0 },
+        { value: '3', angle: 90 },
+        { value: '6', angle: 180 },
+        { value: '9', angle: 270 },
+      ].map((marker) => {
+        const point = toPolarPoint(marker.angle, radius - 24)
+
+        return (
+          <text
+            key={marker.value}
+            x={point.x}
+            y={point.y}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            className="fill-foreground select-none text-sm font-semibold"
+          >
+            {marker.value}
+          </text>
+        )
+      })} */}
+
       <line
         x1={center}
         y1={center}
@@ -218,7 +243,16 @@ export function Clock({
         strokeWidth={minuteIsEmphasized ? 5 : 4}
         strokeLinecap="round"
       />
-      <circle cx={center} cy={center} r={5} className="fill-primary" />
+      <line
+        x1={center}
+        y1={center}
+        x2={secondTip.x}
+        y2={secondTip.y}
+        className="stroke-destructive"
+        strokeWidth={2}
+        strokeLinecap="round"
+      />
+      <circle cx={center} cy={center} r={8} className="fill-primary" />
     </svg>
   )
 }
