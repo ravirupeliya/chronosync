@@ -12,7 +12,7 @@ type DatePickerControlProps = {
 
 export function DatePickerControl({ value, onChange }: DatePickerControlProps) {
   return (
-    <div className="grid gap-2">
+    <div className="lg:grid gap-2 hidden">
       <span className="text-sm font-medium">Date</span>
       <Popover>
         <PopoverTrigger asChild>

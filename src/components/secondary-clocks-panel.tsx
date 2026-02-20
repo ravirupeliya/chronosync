@@ -58,15 +58,26 @@ export function SecondaryClocksPanel({
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between gap-4">
-        <div>
+      <CardHeader className="flex flex-row items-start justify-between gap-3">
+        <div className="min-w-0">
           <CardTitle className="text-xl">Secondary Clocks</CardTitle>
           <CardDescription>Synced to primary date and time</CardDescription>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <Button
             variant="outline"
-            className="border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
+            size="icon"
+            className="border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive sm:hidden"
+            onClick={onClearAllClocks}
+            disabled={secondaryTimeZones.length === 0}
+            aria-label="Clear all secondary clocks"
+          >
+            <Trash2 className="size-4" />
+            <span className="sr-only">Clear all</span>
+          </Button>
+          <Button
+            variant="outline"
+            className="hidden border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive sm:inline-flex"
             onClick={onClearAllClocks}
             disabled={secondaryTimeZones.length === 0}
             aria-label="Clear all secondary clocks"
@@ -76,12 +87,18 @@ export function SecondaryClocksPanel({
           </Button>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
+              <Button size="icon" className="sm:hidden" aria-label="Add secondary clock">
+                <Plus className="size-4" />
+                <span className="sr-only">Add clock</span>
+              </Button>
+            </DialogTrigger>
+            <DialogTrigger asChild>
+              <Button className="hidden sm:inline-flex">
                 <Plus className="mr-1 size-4" />
                 Add clock
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>Add secondary clock</DialogTitle>
                 <DialogDescription>
@@ -96,7 +113,7 @@ export function SecondaryClocksPanel({
                 exclude={[primaryTimeZone, ...secondaryTimeZones]}
               />
               <DialogFooter>
-                <Button className="cursor-pointer" onClick={addClock} disabled={!pendingZone}>
+                <Button className="w-full cursor-pointer sm:w-auto" onClick={addClock} disabled={!pendingZone}>
                   Add
                 </Button>
               </DialogFooter>

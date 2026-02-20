@@ -76,18 +76,20 @@ export function PrimaryClockPanel({
         </div>
 
         <div className="grid content-start gap-4">
-          <TimeZoneSelect
-            value={timeZone}
-            options={options}
-            onChange={onTimeZoneChange}
-            label="Primary time zone"
-          />
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2 sm:grid-cols-2 lg:grid-cols-1 lg:gap-4">
+            <TimeZoneSelect
+              value={timeZone}
+              options={options}
+              onChange={onTimeZoneChange}
+              label="Primary time zone"
+            />
+
+            <AMPMToggle value={amPm} onChange={onAmPmChange} />
+          </div>
 
           <DatePickerControl value={local.toJSDate()} onChange={onDateChange} />
 
-          <AMPMToggle value={amPm} onChange={onAmPmChange} />
-
-          <div className="rounded-lg border bg-card p-3 text-sm">
+          <div className="hidden rounded-lg border bg-card p-3 text-sm sm:block">
             <div className="font-medium">Current primary zone</div>
             <div className="mt-1 text-muted-foreground">{timeZone}</div>
           </div>

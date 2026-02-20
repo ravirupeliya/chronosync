@@ -84,7 +84,7 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
   const selectedFlag = getFlagComponent(selected?.countryCode)
 
   return (
-    <div className="grid gap-2">
+    <div className="grid min-w-0 gap-2">
       <span className="text-sm font-medium">{label}</span>
       <Popover
         open={open}
@@ -102,7 +102,7 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
             role="combobox"
             aria-expanded={open}
             aria-label={label}
-            className="w-full justify-between"
+            className="w-full min-w-0 justify-between"
           >
             <span className="flex min-w-0 items-center gap-2 truncate">
               {selectedFlag ? (
@@ -116,7 +116,11 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
             <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-120 p-0" align="start" portalled={false}>
+        <PopoverContent
+          className="w-[min(36rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] p-0"
+          align="start"
+          portalled={false}
+        >
           <Command shouldFilter={false}>
             <CommandInput
               placeholder="Search time zone..."
