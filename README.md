@@ -1,73 +1,136 @@
-# React + TypeScript + Vite
+# ChronoSync
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+ChronoSync is a React + TypeScript web application for comparing time across regions. It provides a **primary interactive clock** for editing date/time in a chosen IANA time zone, and a **secondary clocks board** for tracking multiple regions side-by-side.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Project Overview
 
-## React Compiler
+### Purpose
+- Help users coordinate schedules across global time zones.
+- Keep a single source of truth (UTC) while presenting localized views.
+- Support quick visual comparison via analog clocks and readable date/time summaries.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Core Capabilities
+- Select a primary time zone from searchable IANA options with country context.
+- Change primary date and time using:
+  - analog clock hand dragging,
+  - AM/PM toggle,
+  - date picker.
+- Add/remove secondary clocks tied to the same UTC instant.
+- Reorder secondary clocks with drag-and-drop.
+- Persist theme and secondary clock selection in local storage.
+- Handle daylight saving edge cases (invalid/ambiguous local times) with user-facing warnings.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## High-Level Architecture
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Application Structure
+- `src/App.tsx`
+  - Owns global UI state and orchestrates app behavior.
+  - Coordinates primary and secondary panel interactions.
+- `src/components/primary-clock-panel.tsx`
+  - Primary zone controls, interactive clock, DST warning display.
+- `src/components/secondary-clocks-panel.tsx`
+  - Secondary cards list, add dialog, clear-all, drag-and-drop ordering.
+- `src/lib/time-utils.ts`
+  - Time zone option generation, UTC/local conversion, DST guardrails.
+- `src/components/ui/*`
+  - Reusable UI primitives (button, dialog, popover, command list, etc.).
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Data Flow (High Level)
+1. App stores a canonical `primaryDateTimeUtc` (`Luxon DateTime` in UTC).
+2. Primary panel emits local date/time edits for the selected primary zone.
+3. `buildUtcFromLocalParts(...)` converts local parts back to UTC, returning warnings when DST rules cause adjustment/ambiguity.
+4. Secondary panel renders each configured zone from the same UTC instant.
+5. Persisted preferences (theme + secondary zones) are read on load and updated on state changes.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### State Model
+- **Theme state**: `light | dark`, synced to `<html class="dark">` and local storage.
+- **Primary state**:
+  - `primaryTimeZone`
+  - `primaryDateTimeUtc`
+  - `warning` (DST/invalid local time messaging)
+- **Secondary state**:
+  - ordered `secondaryTimeZones[]`
+  - add/remove/reorder handlers
+
+---
+
+## Technical Details
+
+### Stack
+- React 19 + TypeScript 5
+- Vite 7 build/dev tooling
+- Tailwind CSS 4 (`@tailwindcss/vite`) for styling
+- shadcn-style UI primitives and Radix-based components
+- Luxon for date/time and zone-aware computation
+- `countries-and-timezones` + `country-flag-icons` for zone metadata/flags
+- `@dnd-kit/*` for sortable secondary clocks
+
+### Runtime and Time Handling
+- The app ticks once per second using a `setInterval` in `App`.
+- UI displays use `DateTime#setZone(...)` to localize from UTC.
+- Zone options are generated dynamically from `Intl.supportedValuesOf('timeZone')` with fallback zones.
+- Offsets are computed against a reference UTC instant and displayed as `GMT±HH:mm`.
+- DST logic includes:
+  - detection of non-existent local times (spring-forward gap),
+  - detection of ambiguous local times (fall-back overlap),
+  - clear user warnings while keeping behavior deterministic.
+
+### UI and Interaction Patterns
+- Searchable time zone picker with incremental rendering in long lists.
+- Primary analog clock supports drag-to-set time.
+- Secondary clocks are rendered as cards with:
+  - zone metadata,
+  - analog + textual time display,
+  - drag handle behavior powered by DnD sensors (mouse/touch/keyboard).
+
+### Project Configuration Notes
+- Path alias `@` points to `src` (configured in `vite.config.ts`).
+- StrictMode is enabled in `src/main.tsx`.
+- Scripts:
+  - `npm run dev` – start Vite dev server
+  - `npm run build` – type-check and production build
+  - `npm run lint` – run ESLint
+  - `npm run preview` – preview built app
+
+---
+
+## Getting Started
+
+### Prerequisites
+- Node.js 20+
+- npm 10+
+
+### Install and Run
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Build for Production
+```bash
+npm run build
+npm run preview
 ```
+
+---
+
+## Directory Snapshot
+
+```text
+src/
+  App.tsx
+  main.tsx
+  components/
+    primary-clock-panel.tsx
+    secondary-clocks-panel.tsx
+    time-zone-select.tsx
+    ...
+  lib/
+    time-utils.ts
+```
+
+This layout keeps business/time logic in `lib`, app-level orchestration in `App`, and UI concerns in focused component modules.
