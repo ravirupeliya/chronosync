@@ -7,6 +7,7 @@ import logoLightUrl from '@/assets/chronosync-logo.svg'
 import { PrimaryClockPanel } from '@/components/primary-clock-panel'
 import { SecondaryClocksPanel } from '@/components/secondary-clocks-panel'
 import { Button } from '@/components/ui/button'
+import { initializeAnalytics, trackEvent, trackPageView } from '@/lib/analytics'
 import { buildTimeZoneOptions, buildUtcFromLocalParts, localPartsFromUtc } from '@/lib/time-utils'
 
 const DEFAULT_PRIMARY_ZONE = 'Pacific/Auckland'
@@ -115,6 +116,10 @@ function App() {
     setPrimaryTimeZone(zone)
     setSecondaryTimeZones((previous) => previous.filter((item) => item !== zone))
     setWarning(undefined)
+    trackEvent('timezone_selected', {
+      zone,
+      selection_type: 'primary',
+    })
   }
 
   const handlePrimaryDateChange = (date: Date) => {
@@ -178,19 +183,37 @@ function App() {
       if (previous.includes(zone)) {
         return previous
       }
+
+      trackEvent('secondary_clock_added', {
+        zone,
+        secondary_count: previous.length + 1,
+      })
       return [...previous, zone]
     })
   }
 
   const handleRemoveSecondaryClock = (zone: string) => {
     setSecondaryTimeZones((previous) => previous.filter((item) => item !== zone))
+    trackEvent('secondary_clock_removed', {
+      zone,
+    })
   }
 
   const handleClearAllSecondaryClocks = () => {
+    if (secondaryTimeZones.length > 0) {
+      trackEvent('secondary_clocks_cleared', {
+        cleared_count: secondaryTimeZones.length,
+      })
+    }
     setSecondaryTimeZones([])
   }
 
   const handleReorderSecondaryClocks = (zones: string[]) => {
+    if (zones.join('|') !== secondaryTimeZones.join('|')) {
+      trackEvent('secondary_clocks_reordered', {
+        secondary_count: zones.length,
+      })
+    }
     setSecondaryTimeZones(zones)
   }
 
@@ -211,8 +234,29 @@ function App() {
     return () => window.clearInterval(intervalId)
   }, [])
 
+  useEffect(() => {
+    initializeAnalytics()
+    trackPageView()
+  }, [])
+
+  useEffect(() => {
+    if (!warning) {
+      return
+    }
+
+    trackEvent('dst_warning_shown', {
+      warning_type: warning.toLowerCase().includes('ambiguous') ? 'ambiguous' : 'invalid_or_adjusted',
+    })
+  }, [warning])
+
   const toggleTheme = () => {
-    setTheme((current) => (current === 'dark' ? 'light' : 'dark'))
+    setTheme((current) => {
+      const nextTheme = current === 'dark' ? 'light' : 'dark'
+      trackEvent('theme_toggled', {
+        selected_theme: nextTheme,
+      })
+      return nextTheme
+    })
   }
 
   const logoUrl = theme === 'dark' ? logoDarkUrl : logoLightUrl

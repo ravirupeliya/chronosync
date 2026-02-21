@@ -118,6 +118,48 @@ npm run preview
 
 ---
 
+## Traffic Tracking (Free)
+
+ChronoSync includes built-in support for **Google Analytics 4 (GA4)** via `gtag` and is designed to be paired with **Google Search Console (GSC)**.
+
+### 1) Enable Google Analytics 4
+1. In GA4, create a Web Data Stream for:
+  - `https://chronosync-five.vercel.app/`
+2. Copy your Measurement ID (example: `G-XXXXXXXXXX`).
+3. Create `.env.local` in the project root (you can copy values from `.env.example`).
+
+4. Set your value:
+
+```env
+VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+5. Build/deploy the app.
+
+If `VITE_GA_MEASUREMENT_ID` is not set, analytics is automatically disabled.
+
+### 2) Events tracked in the app
+- `page_view`
+- `timezone_selected` (`selection_type: primary`)
+- `secondary_clock_added`
+- `secondary_clock_removed`
+- `secondary_clocks_cleared`
+- `secondary_clocks_reordered`
+- `theme_toggled`
+- `dst_warning_shown`
+
+### 3) Enable Google Search Console
+1. Add URL-prefix property: `https://chronosync-five.vercel.app/`
+2. Verify ownership (DNS or HTML tag method).
+3. Submit sitemap:
+  - `https://chronosync-five.vercel.app/sitemap.xml`
+4. Monitor:
+  - Indexing status
+  - Search queries / CTR
+  - Core Web Vitals
+
+---
+
 ## Directory Snapshot
 
 ```text
