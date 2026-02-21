@@ -4,10 +4,101 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>chronosync</title>
+    <title>ChronoSync | World Clock, Time Zone Converter & Meeting Planner</title>
+    <meta
+      name="description"
+      content="ChronoSync is a fast world clock and time zone converter to compare global times, plan international meetings, and manage daylight saving changes."
+    />
+    <meta
+      name="keywords"
+      content="world clock,time zone converter,timezone converter,meeting planner,international meeting time,time difference,DST calculator,global clock"
+    />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="author" content="ChronoSync" />
+    <meta name="theme-color" content="#111827" />
+
+    <link rel="canonical" href="https://chronosync-five.vercel.app/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ChronoSync" />
+    <meta property="og:title" content="ChronoSync | World Clock, Time Zone Converter & Meeting Planner" />
+    <meta
+      property="og:description"
+      content="Compare world times instantly, convert between time zones, and schedule global collaboration with confidence."
+    />
+    <meta property="og:url" content="https://chronosync-five.vercel.app/" />
+    <meta property="og:image" content="/favicon.svg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ChronoSync | World Clock, Time Zone Converter & Meeting Planner" />
+    <meta
+      name="twitter:description"
+      content="World clock + time zone converter designed for distributed teams and international planning."
+    />
+    <meta name="twitter:image" content="/favicon.svg" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "ChronoSync",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web",
+        "description": "ChronoSync helps users compare multiple time zones, convert local times, and plan meetings across regions while handling daylight saving transitions.",
+        "url": "https://chronosync-five.vercel.app/",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "featureList": [
+          "Primary interactive analog clock",
+          "Multiple secondary clocks",
+          "Searchable IANA time zone picker",
+          "Drag-and-drop clock reordering",
+          "Daylight saving awareness and warnings"
+        ]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Does ChronoSync handle daylight saving time?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. ChronoSync detects ambiguous and non-existent local times during daylight saving transitions and shows warnings when adjustments are needed."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I compare more than one city at the same time?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. You can add multiple secondary clocks and reorder them for quick global time comparisons."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is ChronoSync free to use?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. ChronoSync is currently available as a free browser-based web app."
+            }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      ChronoSync is a world clock and time zone converter web app. Enable JavaScript to compare regions,
+      convert local times, and plan international meetings.
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

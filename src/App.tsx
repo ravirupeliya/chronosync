@@ -223,7 +223,12 @@ function App() {
         <header className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <img src={logoUrl} alt="ChronoSync logo" className="size-10 rounded-md" />
-            <h1 className="text-3xl font-bold tracking-tight">ChronoSync</h1>
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">ChronoSync</h1>
+              <p className="text-sm text-muted-foreground">
+                World clock and time zone converter for global teams.
+              </p>
+            </div>
           </div>
           <Button
             variant="outline"
@@ -257,6 +262,57 @@ function App() {
           onClearAllClocks={handleClearAllSecondaryClocks}
           onReorderClocks={handleReorderSecondaryClocks}
         />
+
+        <section aria-labelledby="chronosync-overview" className="rounded-lg border bg-card p-4 sm:p-5">
+          <h2 id="chronosync-overview" className="text-xl font-semibold tracking-tight">
+            Time zone converter and world clock overview
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            ChronoSync helps you compare city times, convert local schedules, and pick meeting windows across
+            distributed teams. The primary clock controls the source date and time, while secondary clocks stay in sync
+            for instant global comparison.
+          </p>
+
+          <h3 className="mt-4 text-base font-semibold">What ChronoSync helps with</h3>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+            <li>Convert time between countries and IANA time zones.</li>
+            <li>Check current time differences for remote teams and clients.</li>
+            <li>Plan international meetings with daylight saving awareness.</li>
+            <li>Track multiple office locations from a single UTC reference.</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="chronosync-faq" className="rounded-lg border bg-card p-4 sm:p-5">
+          <h2 id="chronosync-faq" className="text-xl font-semibold tracking-tight">
+            Frequently asked questions
+          </h2>
+          <div className="mt-3 space-y-3 text-sm">
+            <details className="rounded-md border p-3">
+              <summary className="cursor-pointer font-medium">Does ChronoSync handle daylight saving time?</summary>
+              <p className="mt-2 text-muted-foreground">
+                Yes. ChronoSync detects ambiguous and non-existent local times during DST transitions and shows a clear
+                warning when an adjustment is required.
+              </p>
+            </details>
+
+            <details className="rounded-md border p-3">
+              <summary className="cursor-pointer font-medium">
+                Can I compare more than one city at the same time?
+              </summary>
+              <p className="mt-2 text-muted-foreground">
+                Yes. Add multiple secondary clocks, then drag and reorder them so your most important regions are always
+                visible first.
+              </p>
+            </details>
+
+            <details className="rounded-md border p-3">
+              <summary className="cursor-pointer font-medium">Is ChronoSync free to use?</summary>
+              <p className="mt-2 text-muted-foreground">
+                Yes. ChronoSync is a browser-based app and currently free to use.
+              </p>
+            </details>
+          </div>
+        </section>
       </div>
     </main>
   )
