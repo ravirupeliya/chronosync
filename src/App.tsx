@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { DateTime } from 'luxon'
 import { Moon, Sun } from 'lucide-react'
 import logoDarkUrl from '@/assets/chronosync-logo-dark.svg'
+import githubIconUrl from '@/assets/github.svg'
 import logoLightUrl from '@/assets/chronosync-logo.svg'
 
 import { PrimaryClockPanel } from '@/components/primary-clock-panel'
@@ -263,7 +264,7 @@ function App() {
 
   return (
     <main className="min-h-screen bg-background">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-4 pt-2 md:px-6 md:pb-6 md:pt-3 lg:px-8 lg:pb-8 lg:pt-4">
+      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 pb-4 pt-2 md:px-6 md:pb-6 md:pt-3 lg:px-8 lg:pb-8 lg:pt-4">
         <header className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <img src={logoUrl} alt="ChronoSync logo" className="size-10 rounded-md" />
@@ -357,6 +358,31 @@ function App() {
             </details>
           </div>
         </section>
+
+        <footer className="mt-auto border-t pt-4">
+          <p className="text-center text-sm text-muted-foreground">
+            Made with ❤️ in New Zealand by{' '}
+            <a
+              href="https://www.linkedin.com/in/ravirupeliya"
+              target="_blank"
+              rel="noreferrer"
+              className="font-medium underline-offset-4 transition-colors hover:text-foreground hover:underline"
+            >
+              Ravi Patel
+            </a>
+            {' '}·{' '}
+            <a
+              href="https://github.com/ravirupeliya"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Ravi Patel on GitHub"
+              title="GitHub"
+              className="inline-flex items-center transition-colors hover:text-foreground"
+            >
+              <img src={githubIconUrl} alt="GitHub" className="size-4 dark:invert" />
+            </a>
+          </p>
+        </footer>
       </div>
     </main>
   )
