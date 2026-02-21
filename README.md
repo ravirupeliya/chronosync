@@ -17,6 +17,7 @@ ChronoSync is a React + TypeScript web application for comparing time across reg
   - analog clock hand dragging,
   - AM/PM toggle,
   - date picker.
+- Switch app language from the header language picker.
 - Add/remove secondary clocks tied to the same UTC instant.
 - Reorder secondary clocks with drag-and-drop.
 - Persist theme and secondary clock selection in local storage.
@@ -118,55 +119,27 @@ npm run preview
 
 ---
 
-## Traffic Tracking (Free)
+## Multi-lingual Support
 
-ChronoSync includes built-in support for **Google Analytics 4 (GA4)** via `gtag` and is designed to be paired with **Google Search Console (GSC)**.
-It also includes **Vercel Analytics** for lightweight, privacy-friendly aggregate traffic insights.
+ChronoSync ships with built-in internationalization using `i18next` + `react-i18next`.
 
-### 0) Enable Vercel Analytics
-1. Deploy the app to Vercel.
-2. In Vercel project settings, enable Analytics.
-3. Open the Analytics tab in Vercel to view visitors, page views, countries, and top pages.
+### Supported Languages
+- English (`en`)
+- Spanish (`es`)
+- French (`fr`)
+- German (`de`)
+- Hindi (`hi`)
+- Chinese (`zh`)
 
-Notes:
-- No extra environment variable is required for Vercel Analytics.
-- Vercel Analytics is automatic aggregate tracking; GA4 remains best for custom product event analysis.
+### Behavior
+- Initial language is resolved from local storage, then browser language, with English as fallback.
+- Language changes are persisted in local storage (`chronosync-language`).
+- The app updates document language (`<html lang>`) and Luxon default locale when language changes.
 
-### 1) Enable Google Analytics 4
-1. In GA4, create a Web Data Stream for:
-  - `https://chronosync-five.vercel.app/`
-2. Copy your Measurement ID (example: `G-XXXXXXXXXX`).
-3. Create `.env.local` in the project root (you can copy values from `.env.example`).
-
-4. Set your value:
-
-```env
-VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
-```
-
-5. Build/deploy the app.
-
-If `VITE_GA_MEASUREMENT_ID` is not set, analytics is automatically disabled.
-
-### 2) Events tracked in the app
-- `page_view`
-- `timezone_selected` (`selection_type: primary`)
-- `secondary_clock_added`
-- `secondary_clock_removed`
-- `secondary_clocks_cleared`
-- `secondary_clocks_reordered`
-- `theme_toggled`
-- `dst_warning_shown`
-
-### 3) Enable Google Search Console
-1. Add URL-prefix property: `https://chronosync-five.vercel.app/`
-2. Verify ownership (DNS or HTML tag method).
-3. Submit sitemap:
-  - `https://chronosync-five.vercel.app/sitemap.xml`
-4. Monitor:
-  - Indexing status
-  - Search queries / CTR
-  - Core Web Vitals
+### Localization Files
+- `src/i18n/config.ts` initializes i18n and syncs locale-related side effects.
+- `src/i18n/resources.ts` contains translation resources and language metadata.
+- `src/components/language-select.tsx` provides the language switcher UI.
 
 ---
 
