@@ -71,7 +71,7 @@ export function PrimaryClockPanel({
           />
           <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
             <Hand className="size-3.5" />
-            <span>Drag clock hands to set time</span>
+            <span>Drag the clock hands to set time</span>
           </div>
         </div>
 
