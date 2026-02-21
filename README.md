@@ -186,3 +186,9 @@ src/
 ```
 
 This layout keeps business/time logic in `lib`, app-level orchestration in `App`, and UI concerns in focused component modules.
+
+---
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE).
