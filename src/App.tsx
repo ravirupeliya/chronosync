@@ -368,7 +368,7 @@ function App() {
             </a>
             {' '}·{' '}
             <a
-              href="https://github.com/ravirupeliya"
+              href="https://github.com/ravirupeliya/chronosync"
               target="_blank"
               rel="noreferrer"
               aria-label={t('footer.githubAria')}
