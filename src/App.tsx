@@ -128,9 +128,24 @@ function App() {
   }
 
   const handlePrimaryClockTimeChange = (hour24: number, minute: number) => {
-    const local = localPartsFromUtc(primaryDateTimeUtc, primaryTimeZone)
+    const currentLocal = primaryDateTimeUtc.setZone(primaryTimeZone)
+    const currentTotalMinutes = currentLocal.hour * 60 + currentLocal.minute
+    const nextTotalMinutes = hour24 * 60 + minute
+    const minuteDelta = nextTotalMinutes - currentTotalMinutes
+
+    let dayDelta = 0
+    if (minuteDelta <= -12 * 60) {
+      dayDelta = 1
+    } else if (minuteDelta >= 12 * 60) {
+      dayDelta = -1
+    }
+
+    const adjustedDate = currentLocal.plus({ days: dayDelta })
+
     applyLocalParts({
-      ...local,
+      year: adjustedDate.year,
+      month: adjustedDate.month,
+      day: adjustedDate.day,
       hour: hour24,
       minute,
     })
