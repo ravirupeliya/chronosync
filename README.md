@@ -121,6 +121,16 @@ npm run preview
 ## Traffic Tracking (Free)
 
 ChronoSync includes built-in support for **Google Analytics 4 (GA4)** via `gtag` and is designed to be paired with **Google Search Console (GSC)**.
+It also includes **Vercel Analytics** for lightweight, privacy-friendly aggregate traffic insights.
+
+### 0) Enable Vercel Analytics
+1. Deploy the app to Vercel.
+2. In Vercel project settings, enable Analytics.
+3. Open the Analytics tab in Vercel to view visitors, page views, countries, and top pages.
+
+Notes:
+- No extra environment variable is required for Vercel Analytics.
+- Vercel Analytics is automatic aggregate tracking; GA4 remains best for custom product event analysis.
 
 ### 1) Enable Google Analytics 4
 1. In GA4, create a Web Data Stream for:
