@@ -109,7 +109,10 @@ export const localPartsFromUtc = (dateTimeUtc: DateTime, zone: string): LocalDat
 
 export type BuildDateTimeResult = {
   dateTimeUtc: DateTime
-  warning?: string
+  warning?: {
+    type: 'invalid' | 'adjusted' | 'ambiguous'
+    adjustedDateTimeUtc?: DateTime
+  }
 }
 
 export const buildUtcFromLocalParts = (
@@ -134,7 +137,7 @@ export const buildUtcFromLocalParts = (
   if (!adjusted.isValid) {
     return {
       dateTimeUtc: DateTime.now().toUTC(),
-      warning: 'Selected date/time is invalid for this time zone. Falling back to current time.',
+      warning: { type: 'invalid' },
     }
   }
 
@@ -145,14 +148,17 @@ export const buildUtcFromLocalParts = (
   if (adjustedLocal !== requestedLocal) {
     return {
       dateTimeUtc: adjusted.toUTC(),
-      warning: `The selected local time did not exist due to DST. It was adjusted to ${adjusted.toFormat('h:mm a')}.`,
+      warning: {
+        type: 'adjusted',
+        adjustedDateTimeUtc: adjusted.toUTC(),
+      },
     }
   }
 
   if (possibleOffsets.length > 1) {
     return {
       dateTimeUtc: adjusted.toUTC(),
-      warning: 'The selected local time is ambiguous due to DST end. Using the earlier occurrence.',
+      warning: { type: 'ambiguous' },
     }
   }
 

@@ -1,4 +1,5 @@
 import { Switch } from '@/components/ui/switch'
+import { useTranslation } from 'react-i18next'
 
 type AMPMToggleProps = {
   value: 'AM' | 'PM'
@@ -6,6 +7,7 @@ type AMPMToggleProps = {
 }
 
 export function AMPMToggle({ value, onChange }: AMPMToggleProps) {
+  const { t } = useTranslation()
   const isPm = value === 'PM'
 
   return (
@@ -16,7 +18,7 @@ export function AMPMToggle({ value, onChange }: AMPMToggleProps) {
         <Switch
           checked={isPm}
           onCheckedChange={(checked) => onChange(checked ? 'PM' : 'AM')}
-          aria-label="Toggle AM PM"
+          aria-label={t('primaryClock.amPmToggle')}
         />
         <span className={`text-sm font-medium ${isPm ? 'text-foreground' : 'text-muted-foreground'}`}>PM</span>
       </div>

@@ -1,15 +1,22 @@
 import { useEffect, useMemo, useState } from 'react'
 import { DateTime } from 'luxon'
 import { Moon, Sun } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import logoDarkUrl from '@/assets/chronosync-logo-dark.svg'
 import githubIconUrl from '@/assets/github.svg'
 import logoLightUrl from '@/assets/chronosync-logo.svg'
 
+import { LanguageSelect } from '@/components/language-select'
 import { PrimaryClockPanel } from '@/components/primary-clock-panel'
 import { SecondaryClocksPanel } from '@/components/secondary-clocks-panel'
 import { Button } from '@/components/ui/button'
 import { initializeAnalytics, trackEvent, trackPageView } from '@/lib/analytics'
-import { buildTimeZoneOptions, buildUtcFromLocalParts, localPartsFromUtc } from '@/lib/time-utils'
+import {
+  buildTimeZoneOptions,
+  buildUtcFromLocalParts,
+  localPartsFromUtc,
+  type BuildDateTimeResult,
+} from '@/lib/time-utils'
 
 const DEFAULT_PRIMARY_ZONE = 'Pacific/Auckland'
 const THEME_STORAGE_KEY = 'chronosync-theme'
@@ -17,6 +24,7 @@ const SECONDARY_CLOCKS_STORAGE_KEY = 'chronosync-secondary-clocks'
 const DEFAULT_SECONDARY_TIME_ZONES = ['America/New_York', 'Europe/London', 'Asia/Tokyo']
 
 type Theme = 'light' | 'dark'
+type WarningState = BuildDateTimeResult['warning']
 
 const getInitialTheme = (): Theme => {
   if (typeof window === 'undefined') {
@@ -61,11 +69,12 @@ const getInitialSecondaryTimeZones = (): string[] => {
 }
 
 function App() {
+  const { t } = useTranslation()
   const [theme, setTheme] = useState<Theme>(getInitialTheme)
   const [primaryTimeZone, setPrimaryTimeZone] = useState(DEFAULT_PRIMARY_ZONE)
   const [primaryDateTimeUtc, setPrimaryDateTimeUtc] = useState(() => DateTime.now().toUTC().startOf('minute'))
   const [secondaryTimeZones, setSecondaryTimeZones] = useState<string[]>(getInitialSecondaryTimeZones)
-  const [warning, setWarning] = useState<string | undefined>(undefined)
+  const [warning, setWarning] = useState<WarningState>(undefined)
 
   const timeZoneReferenceYear = primaryDateTimeUtc.year
   const timeZoneReferenceMonth = primaryDateTimeUtc.month
@@ -246,7 +255,7 @@ function App() {
     }
 
     trackEvent('dst_warning_shown', {
-      warning_type: warning.toLowerCase().includes('ambiguous') ? 'ambiguous' : 'invalid_or_adjusted',
+      warning_type: warning.type === 'ambiguous' ? 'ambiguous' : 'invalid_or_adjusted',
     })
   }, [warning])
 
@@ -267,23 +276,24 @@ function App() {
       <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 pb-4 pt-2 md:px-6 md:pb-6 md:pt-3 lg:px-8 lg:pb-8 lg:pt-4">
         <header className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <img src={logoUrl} alt="ChronoSync logo" className="size-10 rounded-md" />
+            <img src={logoUrl} alt={t('app.logoAlt')} className="size-10 rounded-md" />
             <div>
               <h1 className="text-3xl font-bold tracking-tight">ChronoSync</h1>
-              <p className="text-sm text-muted-foreground">
-                World clock and time zone converter for global teams.
-              </p>
+              <p className="text-sm text-muted-foreground">{t('app.tagline')}</p>
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={toggleTheme}
-            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-          >
-            {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
-          </Button>
+          <div className="flex items-center gap-2">
+            <LanguageSelect />
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={toggleTheme}
+              aria-label={t('app.switchTheme', { mode: t(theme === 'dark' ? 'app.light' : 'app.dark') })}
+              title={t('app.switchTheme', { mode: t(theme === 'dark' ? 'app.light' : 'app.dark') })}
+            >
+              {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
+            </Button>
+          </div>
         </header>
 
         <PrimaryClockPanel
@@ -310,58 +320,44 @@ function App() {
 
         <section aria-labelledby="chronosync-overview" className="rounded-lg border bg-card p-4 sm:p-5">
           <h2 id="chronosync-overview" className="text-xl font-semibold tracking-tight">
-            Time zone converter and world clock overview
+            {t('overview.title')}
           </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            ChronoSync helps you compare city times, convert local schedules, and pick meeting windows across
-            distributed teams. The primary clock controls the source date and time, while secondary clocks stay in sync
-            for instant global comparison.
-          </p>
+          <p className="mt-2 text-sm text-muted-foreground">{t('overview.description')}</p>
 
-          <h3 className="mt-4 text-base font-semibold">What ChronoSync helps with</h3>
+          <h3 className="mt-4 text-base font-semibold">{t('overview.subtitle')}</h3>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-            <li>Convert time between countries and IANA time zones.</li>
-            <li>Check current time differences for remote teams and clients.</li>
-            <li>Plan international meetings with daylight saving awareness.</li>
-            <li>Track multiple office locations from a single UTC reference.</li>
+            <li>{t('overview.item1')}</li>
+            <li>{t('overview.item2')}</li>
+            <li>{t('overview.item3')}</li>
+            <li>{t('overview.item4')}</li>
           </ul>
         </section>
 
         <section aria-labelledby="chronosync-faq" className="rounded-lg border bg-card p-4 sm:p-5">
           <h2 id="chronosync-faq" className="text-xl font-semibold tracking-tight">
-            Frequently asked questions
+            {t('faq.title')}
           </h2>
           <div className="mt-3 space-y-3 text-sm">
             <details className="rounded-md border p-3">
-              <summary className="cursor-pointer font-medium">Does ChronoSync handle daylight saving time?</summary>
-              <p className="mt-2 text-muted-foreground">
-                Yes. ChronoSync detects ambiguous and non-existent local times during DST transitions and shows a clear
-                warning when an adjustment is required.
-              </p>
+              <summary className="cursor-pointer font-medium">{t('faq.q1')}</summary>
+              <p className="mt-2 text-muted-foreground">{t('faq.a1')}</p>
             </details>
 
             <details className="rounded-md border p-3">
-              <summary className="cursor-pointer font-medium">
-                Can I compare more than one city at the same time?
-              </summary>
-              <p className="mt-2 text-muted-foreground">
-                Yes. Add multiple secondary clocks, then drag and reorder them so your most important regions are always
-                visible first.
-              </p>
+              <summary className="cursor-pointer font-medium">{t('faq.q2')}</summary>
+              <p className="mt-2 text-muted-foreground">{t('faq.a2')}</p>
             </details>
 
             <details className="rounded-md border p-3">
-              <summary className="cursor-pointer font-medium">Is ChronoSync free to use?</summary>
-              <p className="mt-2 text-muted-foreground">
-                Yes. ChronoSync is a browser-based app and currently free to use.
-              </p>
+              <summary className="cursor-pointer font-medium">{t('faq.q3')}</summary>
+              <p className="mt-2 text-muted-foreground">{t('faq.a3')}</p>
             </details>
           </div>
         </section>
 
         <footer className="mt-auto border-t pt-4">
           <p className="text-center text-sm text-muted-foreground">
-            Made with ❤️ in New Zealand by{' '}
+            {t('footer.madeBy')}{' '}
             <a
               href="https://www.linkedin.com/in/ravirupeliya"
               target="_blank"
@@ -375,11 +371,11 @@ function App() {
               href="https://github.com/ravirupeliya"
               target="_blank"
               rel="noreferrer"
-              aria-label="Ravi Patel on GitHub"
-              title="GitHub"
+              aria-label={t('footer.githubAria')}
+              title={t('footer.githubTitle')}
               className="inline-flex items-center transition-colors hover:text-foreground"
             >
-              <img src={githubIconUrl} alt="GitHub" className="size-4 dark:invert" />
+              <img src={githubIconUrl} alt={t('footer.githubAlt')} className="size-4 dark:invert" />
             </a>
           </p>
         </footer>

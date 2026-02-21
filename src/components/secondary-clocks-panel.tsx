@@ -21,6 +21,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { DateTime } from 'luxon'
 import { Plus, Trash2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { Clock } from '@/components/clock'
 import { CountryFlag } from '@/components/country-flag'
@@ -58,6 +59,7 @@ type SecondaryClockCardProps = {
 }
 
 function SecondaryClockCard({ zone, primaryDateTimeUtc, option, onRemoveClock }: SecondaryClockCardProps) {
+  const { t } = useTranslation()
   const local = primaryDateTimeUtc.setZone(zone)
 
   return (
@@ -75,7 +77,7 @@ function SecondaryClockCard({ zone, primaryDateTimeUtc, option, onRemoveClock }:
           <Button
             variant="ghost"
             size="icon"
-            aria-label={`Remove ${zone}`}
+            aria-label={t('secondaryClock.removeAria', { zone })}
             onClick={() => onRemoveClock(zone)}
           >
             <Trash2 className="size-4" />
@@ -104,6 +106,7 @@ function SortableClockCard({
   onRemoveClock,
   showPlaceholder,
 }: SortableClockCardProps) {
+  const { t } = useTranslation()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: zone })
 
   const style = {
@@ -115,13 +118,13 @@ function SortableClockCard({
     <div ref={setNodeRef} style={style} className="touch-pan-y">
       {showPlaceholder ? (
         <div className="flex min-h-80.5 items-center justify-center rounded-xl border border-dashed border-primary/60 bg-muted/30 p-4 text-sm text-muted-foreground">
-          Drop to place clock
+          {t('secondaryClock.dropPlaceholder')}
         </div>
       ) : (
         <div
           {...attributes}
           {...listeners}
-          aria-label={`Drag to reorder ${zone}`}
+          aria-label={t('secondaryClock.dragAria', { zone })}
           className={`rounded-xl border bg-card p-4 ${isDragging ? 'cursor-grabbing' : 'cursor-move'}`}
         >
           <SecondaryClockCard
@@ -132,7 +135,7 @@ function SortableClockCard({
           />
         </div>
       )}
-      {isDragging ? <span className="sr-only">Dragging {zone}</span> : null}
+      {isDragging ? <span className="sr-only">{t('secondaryClock.dragging', { zone })}</span> : null}
     </div>
   )
 }
@@ -147,6 +150,7 @@ export function SecondaryClocksPanel({
   onClearAllClocks,
   onReorderClocks,
 }: SecondaryClocksPanelProps) {
+  const { t } = useTranslation()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [pendingZone, setPendingZone] = useState('')
   const [activeZone, setActiveZone] = useState<string | null>(null)
@@ -244,8 +248,8 @@ export function SecondaryClocksPanel({
     <Card>
       <CardHeader className="flex flex-row items-start justify-between gap-3">
         <div className="min-w-0">
-          <CardTitle className="text-xl">Secondary Clocks</CardTitle>
-          <CardDescription>Synced to primary date and time</CardDescription>
+          <CardTitle className="text-xl">{t('secondaryClock.title')}</CardTitle>
+          <CardDescription>{t('secondaryClock.description')}</CardDescription>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <Button
@@ -254,51 +258,49 @@ export function SecondaryClocksPanel({
             className="border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive sm:hidden"
             onClick={onClearAllClocks}
             disabled={secondaryTimeZones.length === 0}
-            aria-label="Clear all secondary clocks"
+            aria-label={t('secondaryClock.clearAllAria')}
           >
             <Trash2 className="size-4" />
-            <span className="sr-only">Clear all</span>
+            <span className="sr-only">{t('secondaryClock.clearAll')}</span>
           </Button>
           <Button
             variant="outline"
             className="hidden border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive sm:inline-flex"
             onClick={onClearAllClocks}
             disabled={secondaryTimeZones.length === 0}
-            aria-label="Clear all secondary clocks"
+            aria-label={t('secondaryClock.clearAllAria')}
           >
             <Trash2 className="mr-1 size-4" />
-            Clear all
+            {t('secondaryClock.clearAll')}
           </Button>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="icon" className="sm:hidden" aria-label="Add secondary clock">
+              <Button size="icon" className="sm:hidden" aria-label={t('secondaryClock.addClockAria')}>
                 <Plus className="size-4" />
-                <span className="sr-only">Add clock</span>
+                <span className="sr-only">{t('secondaryClock.addClock')}</span>
               </Button>
             </DialogTrigger>
             <DialogTrigger asChild>
               <Button className="hidden sm:inline-flex">
                 <Plus className="mr-1 size-4" />
-                Add clock
+                {t('secondaryClock.addClock')}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>Add secondary clock</DialogTitle>
-                <DialogDescription>
-                  Choose another IANA time zone to track against the primary clock.
-                </DialogDescription>
+                <DialogTitle>{t('secondaryClock.addClockTitle')}</DialogTitle>
+                <DialogDescription>{t('secondaryClock.addClockDescription')}</DialogDescription>
               </DialogHeader>
               <TimeZoneSelect
                 value={pendingZone}
                 options={options}
                 onChange={setPendingZone}
-                label="Secondary time zone"
+                label={t('secondaryClock.secondaryTimezone')}
                 exclude={[primaryTimeZone, ...secondaryTimeZones]}
               />
               <DialogFooter>
                 <Button className="w-full cursor-pointer sm:w-auto" onClick={addClock} disabled={!pendingZone}>
-                  Add
+                  {t('secondaryClock.add')}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -309,7 +311,7 @@ export function SecondaryClocksPanel({
       <CardContent className="pt-3 px-3 lg:px-6">
         {secondaryTimeZones.length === 0 ? (
           <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-            No secondary clocks yet. Add a clock to compare regions.
+            {t('secondaryClock.empty')}
           </div>
         ) : (
           <DndContext

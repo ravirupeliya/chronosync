@@ -1,6 +1,7 @@
 import { createElement, useMemo, useState, type ComponentType, type SVGProps } from 'react'
 import * as Flags from 'country-flag-icons/react/3x2'
 import { ChevronsUpDown, Globe } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -39,6 +40,7 @@ const formatCountryCode = (countryCode?: string): string =>
   countryCode && countryCode.length === 2 ? countryCode.toUpperCase() : 'GL'
 
 export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }: TimeZoneSelectProps) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT)
@@ -111,7 +113,7 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
                 <Globe className="size-4 text-muted-foreground" aria-hidden />
               )}
               <span className="text-xs text-muted-foreground">{formatCountryCode(selected?.countryCode)}</span>
-              <span className="truncate">{selected?.label ?? 'Select a time zone'}</span>
+              <span className="truncate">{selected?.label ?? t('timezoneSelect.selectTimezone')}</span>
             </span>
             <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
           </Button>
@@ -123,7 +125,7 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
         >
           <Command shouldFilter={false}>
             <CommandInput
-              placeholder="Search time zone..."
+              placeholder={t('timezoneSelect.searchPlaceholder')}
               value={query}
               onValueChange={(nextQuery) => {
                 setQuery(nextQuery)
@@ -131,7 +133,7 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
               }}
             />
             <CommandList onScroll={handleListScroll}>
-              <CommandEmpty>No time zone found.</CommandEmpty>
+              <CommandEmpty>{t('timezoneSelect.notFound')}</CommandEmpty>
               <CommandGroup>
                 {visibleOptions.map((option) => {
                   const flag = getFlagComponent(option.countryCode)
