@@ -108,11 +108,11 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
           >
             <span className="flex min-w-0 items-center gap-2 truncate">
               {selectedFlag ? (
-                createElement(selectedFlag, { className: 'size-4 rounded-xs', 'aria-hidden': true })
+                createElement(selectedFlag, { className: 'size-5 rounded-xs', 'aria-hidden': true })
               ) : (
-                <Globe className="size-4 text-muted-foreground" aria-hidden />
+                <Globe className="size-5 text-muted-foreground" aria-hidden />
               )}
-              <span className="text-xs text-muted-foreground">{formatCountryCode(selected?.countryCode)}</span>
+              <span className="w-5 shrink-0 text-xs text-center leading-none text-muted-foreground">{formatCountryCode(selected?.countryCode)}</span>
               <span className="truncate">{selected?.label ?? t('timezoneSelect.selectTimezone')}</span>
             </span>
             <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
@@ -139,25 +139,26 @@ export function TimeZoneSelect({ value, options, onChange, label, exclude = [] }
                   const flag = getFlagComponent(option.countryCode)
 
                   return (
-                  <CommandItem
-                    key={option.value}
-                    value={option.value}
-                    onSelect={() => {
-                      onChange(option.value)
-                      setQuery('')
-                      setOpen(false)
-                    }}
-                  >
-                    {flag ? (
-                      createElement(flag, { className: 'mr-2 size-4 rounded-xs', 'aria-hidden': true })
-                    ) : (
-                      <Globe className="mr-2 size-4 text-muted-foreground" aria-hidden />
-                    )}
-                    <span className="mr-1 text-xs text-muted-foreground">
-                      {formatCountryCode(option.countryCode)}
-                    </span>
-                    <span>{option.label}</span>
-                  </CommandItem>
+                    <CommandItem
+                      key={option.value}
+                      value={option.value}
+                      className="gap-2"
+                      onSelect={() => {
+                        onChange(option.value)
+                        setQuery('')
+                        setOpen(false)
+                      }}
+                    >
+                      {flag ? (
+                        createElement(flag, { className: 'size-5 rounded-xs', 'aria-hidden': true })
+                      ) : (
+                        <Globe className="size-4 text-muted-foreground" aria-hidden />
+                      )}
+                      <span className="w-5 shrink-0 text-xs text-center leading-none text-muted-foreground">
+                        {formatCountryCode(option.countryCode)}
+                      </span>
+                      <span className="leading-none">{option.label}</span>
+                    </CommandItem>
                   )
                 })}
               </CommandGroup>
