@@ -2,15 +2,24 @@ import { useEffect, useMemo, useState } from 'react'
 import { DateTime } from 'luxon'
 import { Moon, Sun } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import logoDarkUrl from '@/assets/chronosync-logo-dark.svg'
 import githubIconUrl from '@/assets/github.svg'
 import logoLightUrl from '@/assets/chronosync-logo.svg'
 
+import { CookieConsentBanner } from '@/components/cookie-consent-banner'
 import { LanguageSelect } from '@/components/language-select'
 import { PrimaryClockPanel } from '@/components/primary-clock-panel'
 import { SecondaryClocksPanel } from '@/components/secondary-clocks-panel'
 import { Button } from '@/components/ui/button'
 import { initializeAnalytics, trackEvent, trackPageView } from '@/lib/analytics'
+import {
+  getStoredConsent,
+  hasConsentForPreferences,
+  onConsentChanged,
+  type ConsentState,
+} from '@/lib/consent'
 import {
   buildTimeZoneOptions,
   buildUtcFromLocalParts,
@@ -31,9 +40,11 @@ const getInitialTheme = (): Theme => {
     return 'light'
   }
 
-  const saved = window.localStorage.getItem(THEME_STORAGE_KEY)
-  if (saved === 'light' || saved === 'dark') {
-    return saved
+  if (hasConsentForPreferences()) {
+    const saved = window.localStorage.getItem(THEME_STORAGE_KEY)
+    if (saved === 'light' || saved === 'dark') {
+      return saved
+    }
   }
 
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
@@ -41,6 +52,10 @@ const getInitialTheme = (): Theme => {
 
 const getInitialSecondaryTimeZones = (): string[] => {
   if (typeof window === 'undefined') {
+    return DEFAULT_SECONDARY_TIME_ZONES
+  }
+
+  if (!hasConsentForPreferences()) {
     return DEFAULT_SECONDARY_TIME_ZONES
   }
 
@@ -71,10 +86,15 @@ const getInitialSecondaryTimeZones = (): string[] => {
 function App() {
   const { t } = useTranslation()
   const [theme, setTheme] = useState<Theme>(getInitialTheme)
+  const [consentState, setConsentState] = useState<ConsentState | null>(getStoredConsent)
   const [primaryTimeZone, setPrimaryTimeZone] = useState(DEFAULT_PRIMARY_ZONE)
   const [primaryDateTimeUtc, setPrimaryDateTimeUtc] = useState(() => DateTime.now().toUTC().startOf('minute'))
   const [secondaryTimeZones, setSecondaryTimeZones] = useState<string[]>(getInitialSecondaryTimeZones)
   const [warning, setWarning] = useState<WarningState>(undefined)
+
+  const hasConsentChoice = consentState !== null
+  const preferencesConsentGranted = Boolean(consentState?.preferences.preferences)
+  const analyticsConsentGranted = Boolean(consentState?.preferences.analytics)
 
   const timeZoneReferenceYear = primaryDateTimeUtc.year
   const timeZoneReferenceMonth = primaryDateTimeUtc.month
@@ -229,12 +249,23 @@ function App() {
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark')
-    window.localStorage.setItem(THEME_STORAGE_KEY, theme)
-  }, [theme])
+
+    if (preferencesConsentGranted) {
+      window.localStorage.setItem(THEME_STORAGE_KEY, theme)
+      return
+    }
+
+    window.localStorage.removeItem(THEME_STORAGE_KEY)
+  }, [preferencesConsentGranted, theme])
 
   useEffect(() => {
-    window.localStorage.setItem(SECONDARY_CLOCKS_STORAGE_KEY, JSON.stringify(secondaryTimeZones))
-  }, [secondaryTimeZones])
+    if (preferencesConsentGranted) {
+      window.localStorage.setItem(SECONDARY_CLOCKS_STORAGE_KEY, JSON.stringify(secondaryTimeZones))
+      return
+    }
+
+    window.localStorage.removeItem(SECONDARY_CLOCKS_STORAGE_KEY)
+  }, [preferencesConsentGranted, secondaryTimeZones])
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -245,9 +276,15 @@ function App() {
   }, [])
 
   useEffect(() => {
+    if (!analyticsConsentGranted) {
+      return
+    }
+
     initializeAnalytics()
     trackPageView()
-  }, [])
+  }, [analyticsConsentGranted])
+
+  useEffect(() => onConsentChanged(setConsentState), [])
 
   useEffect(() => {
     if (!warning) {
@@ -273,7 +310,9 @@ function App() {
 
   return (
     <main className="min-h-screen bg-background">
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 pb-4 pt-2 md:px-6 md:pb-6 md:pt-3 lg:px-8 lg:pb-8 lg:pt-4">
+      <div
+        className={`mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 pb-4 pt-2 md:px-6 md:pb-6 md:pt-3 lg:px-8 lg:pt-4 ${hasConsentChoice ? 'lg:pb-8' : 'pb-56 lg:pb-56'}`}
+      >
         <header className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <img src={logoUrl} alt={t('app.logoAlt')} className="size-10 rounded-md" />
@@ -380,6 +419,14 @@ function App() {
           </p>
         </footer>
       </div>
+
+      {!hasConsentChoice && <CookieConsentBanner onConsentSaved={setConsentState} />}
+      {analyticsConsentGranted && (
+        <>
+          <Analytics />
+          <SpeedInsights />
+        </>
+      )}
     </main>
   )
 }

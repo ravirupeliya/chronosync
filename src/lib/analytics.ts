@@ -2,6 +2,8 @@ type AnalyticsPrimitive = string | number | boolean
 
 type AnalyticsParams = Record<string, AnalyticsPrimitive | null | undefined>
 
+import { hasConsentForAnalytics } from '@/lib/consent'
+
 declare global {
   interface Window {
     dataLayer: unknown[]
@@ -12,10 +14,11 @@ declare global {
 const MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID?.trim()
 
 const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined'
-const isAnalyticsEnabled = isBrowser && Boolean(MEASUREMENT_ID)
+
+const isAnalyticsEnabled = () => isBrowser && Boolean(MEASUREMENT_ID) && hasConsentForAnalytics()
 
 const initializeGtag = () => {
-  if (!isAnalyticsEnabled || !MEASUREMENT_ID) {
+  if (!isAnalyticsEnabled() || !MEASUREMENT_ID) {
     return
   }
 
@@ -37,7 +40,7 @@ const initializeGtag = () => {
 }
 
 const loadGtagScript = () => {
-  if (!isAnalyticsEnabled || !MEASUREMENT_ID) {
+  if (!isAnalyticsEnabled() || !MEASUREMENT_ID) {
     return
   }
 
@@ -54,7 +57,7 @@ const loadGtagScript = () => {
 }
 
 const getGtag = () => {
-  if (!isAnalyticsEnabled) {
+  if (!isAnalyticsEnabled()) {
     return undefined
   }
 

@@ -2,6 +2,7 @@ import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import { Settings } from 'luxon'
 
+import { hasConsentForPreferences } from '@/lib/consent'
 import resources, {
   LANGUAGE_LOCALES,
   LANGUAGE_STORAGE_KEY,
@@ -13,9 +14,11 @@ const getInitialLanguage = () => {
     return 'en'
   }
 
-  const stored = window.localStorage.getItem(LANGUAGE_STORAGE_KEY)
-  if (stored) {
-    return normalizeLanguage(stored)
+  if (hasConsentForPreferences()) {
+    const stored = window.localStorage.getItem(LANGUAGE_STORAGE_KEY)
+    if (stored) {
+      return normalizeLanguage(stored)
+    }
   }
 
   return normalizeLanguage(window.navigator.language)
@@ -44,7 +47,11 @@ const syncLocale = (language: string) => {
   }
 
   if (typeof window !== 'undefined') {
-    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, nextLanguage)
+    if (hasConsentForPreferences()) {
+      window.localStorage.setItem(LANGUAGE_STORAGE_KEY, nextLanguage)
+    } else {
+      window.localStorage.removeItem(LANGUAGE_STORAGE_KEY)
+    }
   }
 }
 

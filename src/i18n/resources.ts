@@ -109,6 +109,22 @@ const resources = {
         close: 'Close',
         global: 'Global',
       },
+      consent: {
+        title: 'Cookie preferences',
+        description:
+          'We use necessary cookies to run ChronoSync. Optional preferences cookies remember your settings, and analytics cookies help us improve performance.',
+        necessaryTitle: 'Necessary cookies',
+        necessaryDescription: 'Always on. Required for core app functionality and security.',
+        preferencesTitle: 'Preferences cookies',
+        preferencesDescription: 'Remember language, theme, and saved secondary clocks on this device.',
+        analyticsTitle: 'Analytics cookies',
+        analyticsDescription: 'Help us understand usage to improve reliability and performance.',
+        acceptAll: 'Accept all',
+        rejectOptional: 'Reject optional',
+        customize: 'Customize',
+        hideCustomize: 'Hide customization',
+        savePreferences: 'Save preferences',
+      },
       command: {
         title: 'Command Palette',
         description: 'Search for a command to run...',
@@ -191,6 +207,22 @@ const resources = {
       common: {
         close: 'Cerrar',
         global: 'Global',
+      },
+      consent: {
+        title: 'Preferencias de cookies',
+        description:
+          'Usamos cookies necesarias para ejecutar ChronoSync. Las cookies opcionales de preferencias guardan tu configuración y las cookies de analítica nos ayudan a mejorar el rendimiento.',
+        necessaryTitle: 'Cookies necesarias',
+        necessaryDescription: 'Siempre activas. Requeridas para la funcionalidad y seguridad básicas.',
+        preferencesTitle: 'Cookies de preferencias',
+        preferencesDescription: 'Recuerdan idioma, tema y relojes secundarios guardados en este dispositivo.',
+        analyticsTitle: 'Cookies de analítica',
+        analyticsDescription: 'Nos ayudan a entender el uso para mejorar fiabilidad y rendimiento.',
+        acceptAll: 'Aceptar todo',
+        rejectOptional: 'Rechazar opcionales',
+        customize: 'Personalizar',
+        hideCustomize: 'Ocultar personalización',
+        savePreferences: 'Guardar preferencias',
       },
       command: {
         title: 'Paleta de comandos',
@@ -275,6 +307,22 @@ const resources = {
         close: 'Fermer',
         global: 'Global',
       },
+      consent: {
+        title: 'Préférences de cookies',
+        description:
+          'Nous utilisons des cookies nécessaires au fonctionnement de ChronoSync. Les cookies de préférences facultatifs mémorisent vos réglages et les cookies analytiques nous aident à améliorer les performances.',
+        necessaryTitle: 'Cookies nécessaires',
+        necessaryDescription: 'Toujours actifs. Requis pour le fonctionnement et la sécurité.',
+        preferencesTitle: 'Cookies de préférences',
+        preferencesDescription: 'Mémorisent la langue, le thème et les horloges secondaires enregistrées.',
+        analyticsTitle: 'Cookies analytiques',
+        analyticsDescription: 'Nous aident à comprendre l’usage pour améliorer fiabilité et performance.',
+        acceptAll: 'Tout accepter',
+        rejectOptional: 'Refuser les optionnels',
+        customize: 'Personnaliser',
+        hideCustomize: 'Masquer la personnalisation',
+        savePreferences: 'Enregistrer les préférences',
+      },
       command: {
         title: 'Palette de commandes',
         description: 'Rechercher une commande à exécuter...',
@@ -357,6 +405,22 @@ const resources = {
       common: {
         close: 'Schließen',
         global: 'Global',
+      },
+      consent: {
+        title: 'Cookie-Einstellungen',
+        description:
+          'Wir verwenden notwendige Cookies für den Betrieb von ChronoSync. Optionale Präferenz-Cookies speichern Einstellungen, und Analyse-Cookies helfen uns bei der Leistungsverbesserung.',
+        necessaryTitle: 'Notwendige Cookies',
+        necessaryDescription: 'Immer aktiv. Erforderlich für Kernfunktionen und Sicherheit.',
+        preferencesTitle: 'Präferenz-Cookies',
+        preferencesDescription: 'Speichern Sprache, Design und sekundäre Uhren auf diesem Gerät.',
+        analyticsTitle: 'Analyse-Cookies',
+        analyticsDescription: 'Helfen uns, Nutzung zu verstehen und Zuverlässigkeit zu verbessern.',
+        acceptAll: 'Alle akzeptieren',
+        rejectOptional: 'Optionale ablehnen',
+        customize: 'Anpassen',
+        hideCustomize: 'Anpassung ausblenden',
+        savePreferences: 'Einstellungen speichern',
       },
       command: {
         title: 'Befehls-Palette',
@@ -441,6 +505,22 @@ const resources = {
         close: 'बंद करें',
         global: 'ग्लोबल',
       },
+      consent: {
+        title: 'कुकी प्राथमिकताएँ',
+        description:
+          'ChronoSync चलाने के लिए हम आवश्यक कुकीज़ का उपयोग करते हैं। वैकल्पिक प्राथमिकता कुकीज़ आपकी सेटिंग्स याद रखती हैं और एनालिटिक्स कुकीज़ प्रदर्शन सुधारने में मदद करती हैं।',
+        necessaryTitle: 'आवश्यक कुकीज़',
+        necessaryDescription: 'हमेशा चालू। मुख्य कार्यक्षमता और सुरक्षा के लिए आवश्यक।',
+        preferencesTitle: 'प्राथमिकता कुकीज़',
+        preferencesDescription: 'इस डिवाइस पर भाषा, थीम और सेव किए गए सेकेंडरी क्लॉक्स याद रखती हैं।',
+        analyticsTitle: 'एनालिटिक्स कुकीज़',
+        analyticsDescription: 'उपयोग समझने और भरोसेमंदी व प्रदर्शन सुधारने में मदद करती हैं।',
+        acceptAll: 'सभी स्वीकार करें',
+        rejectOptional: 'वैकल्पिक अस्वीकार करें',
+        customize: 'कस्टमाइज़ करें',
+        hideCustomize: 'कस्टमाइज़ेशन छुपाएँ',
+        savePreferences: 'प्राथमिकताएँ सहेजें',
+      },
       command: {
         title: 'कमांड पैलेट',
         description: 'चलाने के लिए कोई कमांड खोजें...',
@@ -523,6 +603,22 @@ const resources = {
       common: {
         close: '关闭',
         global: '全球',
+      },
+      consent: {
+        title: 'Cookie 偏好设置',
+        description:
+          '我们使用必要 Cookie 来运行 ChronoSync。可选偏好 Cookie 用于保存你的设置，分析 Cookie 帮助我们改进性能。',
+        necessaryTitle: '必要 Cookie',
+        necessaryDescription: '始终开启。用于核心功能与安全。',
+        preferencesTitle: '偏好 Cookie',
+        preferencesDescription: '在此设备上记住语言、主题和已保存的次级时钟。',
+        analyticsTitle: '分析 Cookie',
+        analyticsDescription: '帮助我们了解使用情况并提升可靠性与性能。',
+        acceptAll: '全部接受',
+        rejectOptional: '拒绝可选项',
+        customize: '自定义',
+        hideCustomize: '隐藏自定义',
+        savePreferences: '保存偏好',
       },
       command: {
         title: '命令面板',
