@@ -311,7 +311,7 @@ function App() {
   return (
     <main className="min-h-screen bg-background">
       <div
-        className={`mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 pb-4 pt-2 md:px-6 md:pb-6 md:pt-3 lg:px-8 lg:pt-4 ${hasConsentChoice ? 'lg:pb-8' : 'pb-56 lg:pb-56'}`}
+        className={`mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 pb-4 pt-2 md:px-6 md:pb-6 md:pt-3 lg:px-8 lg:pt-4 ${hasConsentChoice ? 'lg:pb-8' : 'pb-44 lg:pb-44'}`}
       >
         <header className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
