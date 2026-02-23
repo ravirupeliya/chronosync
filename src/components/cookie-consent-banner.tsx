@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
@@ -14,17 +14,9 @@ export function CookieConsentBanner({ onConsentSaved }: CookieConsentBannerProps
   const { t } = useTranslation()
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false)
   const [preferencesEnabled, setPreferencesEnabled] = useState(true)
-  const [analyticsEnabled, setAnalyticsEnabled] = useState(false)
-
-  const isSaveDisabled = useMemo(() => !isCustomizeOpen, [isCustomizeOpen])
 
   const handleAcceptAll = () => {
     const state = saveConsent({ preferences: true, analytics: true }, 'accepted')
-    onConsentSaved(state)
-  }
-
-  const handleRejectOptional = () => {
-    const state = saveConsent({ preferences: false, analytics: false }, 'rejected')
     onConsentSaved(state)
   }
 
@@ -32,7 +24,7 @@ export function CookieConsentBanner({ onConsentSaved }: CookieConsentBannerProps
     const state = saveConsent(
       {
         preferences: preferencesEnabled,
-        analytics: analyticsEnabled,
+        analytics: true,
       },
       'customized',
     )
@@ -74,22 +66,22 @@ export function CookieConsentBanner({ onConsentSaved }: CookieConsentBannerProps
                 <Label htmlFor="consent-analytics">{t('consent.analyticsTitle')}</Label>
                 <p className="text-xs text-muted-foreground">{t('consent.analyticsDescription')}</p>
               </div>
-              <Switch id="consent-analytics" checked={analyticsEnabled} onCheckedChange={setAnalyticsEnabled} />
+              <Switch id="consent-analytics" checked disabled aria-readonly />
             </div>
           </div>
         )}
 
         <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" onClick={handleRejectOptional}>
-            {t('consent.rejectOptional')}
-          </Button>
-          <Button variant="outline" onClick={() => setIsCustomizeOpen((current) => !current)}>
-            {isCustomizeOpen ? t('consent.hideCustomize') : t('consent.customize')}
-          </Button>
-          <Button onClick={handleAcceptAll}>{t('consent.acceptAll')}</Button>
-          <Button onClick={handleSavePreferences} disabled={isSaveDisabled} variant="secondary">
-            {t('consent.savePreferences')}
-          </Button>
+          {!isCustomizeOpen ? (
+            <Button variant="outline" onClick={() => setIsCustomizeOpen(true)}>
+              {t('consent.customize')}
+            </Button>
+          ) : (
+            <Button onClick={handleSavePreferences} variant="secondary">
+              {t('consent.savePreferences')}
+            </Button>
+          )}
+          {!isCustomizeOpen && <Button onClick={handleAcceptAll}>{t('consent.acceptAll')}</Button>}
         </div>
       </div>
     </div>

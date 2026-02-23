@@ -71,9 +71,9 @@ export const getStoredConsent = (): ConsentState | null => {
 
 export const hasUserMadeConsentChoice = (): boolean => getStoredConsent() !== null
 
-export const hasConsentForPreferences = (): boolean => Boolean(getStoredConsent()?.preferences.preferences)
+export const hasConsentForPreferences = (): boolean => Boolean(getStoredConsent()?.preferences.preferences ?? true)
 
-export const hasConsentForAnalytics = (): boolean => Boolean(getStoredConsent()?.preferences.analytics)
+export const hasConsentForAnalytics = (): boolean => Boolean(getStoredConsent()?.preferences.analytics ?? true)
 
 export const saveConsent = (
   preferenceState: Pick<ConsentPreferences, 'preferences' | 'analytics'>,
