@@ -14,7 +14,6 @@ import { PrimaryClockPanel } from '@/components/primary-clock-panel';
 import { SecondaryClocksPanel } from '@/components/secondary-clocks-panel';
 import { Button } from '@/components/ui/button';
 import {
-  initializeAnalytics,
   trackEvent,
   trackPageView,
 } from '@/lib/analytics';
