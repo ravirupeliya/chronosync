@@ -307,7 +307,6 @@ function App() {
       return;
     }
 
-    initializeAnalytics();
     trackPageView();
   }, [analyticsConsentGranted]);
 
